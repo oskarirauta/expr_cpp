@@ -1,7 +1,8 @@
 #include <iostream>
 #include <string>
 
-#include "eval/helpers.hpp"
+#include "common.hpp"
+#include "logger.hpp"
 #include "eval/token.hpp"
 
 bool TOKEN::isNull() const {
@@ -21,7 +22,7 @@ const std::string TOKEN::stringValue() const {
 	if ( this -> isString()) {
 		return std::get<std::string>(this -> value);
 	} else if ( this -> isNumber()) {
-		return double2str(std::get<double>(this -> value));
+		return common::to_string(std::get<double>(this -> value));
 	} else if ( this -> isNull()) {
 		return "NULL";
 	} else {

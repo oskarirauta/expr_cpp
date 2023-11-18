@@ -1,7 +1,8 @@
 #include <iostream>
 #include <string>
 
-#include "eval/helpers.hpp"
+#include "common.hpp"
+#include "logger.hpp"
 #include "eval/token.hpp"
 
 TOKEN TOKEN::UNDEF() {

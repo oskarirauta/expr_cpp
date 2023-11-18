@@ -7,17 +7,16 @@ LDFLAGS?=-L/lib -L/usr/lib
 INCLUDES+= -I./include
 
 OBJS:= \
-	objs/helpers.o \
 	objs/token.o \
 	objs/token_ops.o \
 	objs/parser.o \
 	objs/evaluation.o \
 	objs/main.o
 
-world: example
+include common/Makefile.inc
+include logger/Makefile.inc
 
-objs/helpers.o: src/helpers.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -o $@ $<;
+world: example
 
 objs/token.o: src/token.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -o $@ $<;
@@ -34,7 +33,7 @@ objs/evaluation.o: src/evaluation.cpp
 objs/main.o: main.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -o $@ $<;
 
-example: $(OBJS)
+example: $(COMMON_OBJS) $(LOGGER_OBJS) $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -L. $(LIBS) $^ -o $@;
 
 .PHONY: clean

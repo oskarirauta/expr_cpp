@@ -3,12 +3,10 @@
 #include <string>
 
 #include "eval/token.hpp"
-#include "eval/helpers.hpp"
 #include "eval/parser.hpp"
 #include "eval/functions.hpp"
 #include "eval/variables.hpp"
 #include "eval/evaluation.hpp"
-
 
 FUNCTION_ARG hello(FUNCTION_ARGS args) {
 
@@ -38,8 +36,6 @@ int main(int argc, char **argv) {
 
 
 	std::cout << "evaluator++\n" << std::endl;
-
-	std::cout << tolower("HELLO world") << std::endl;
 
 	//std::string s = "  hello::a+   world 123 + 456\t'str1' \"str2\" func1() + func2('hello', 'world') + ('sub1' + 'sub2')";
 	//std::string s = "    999 +  1 + 1 + ( 5 + 2 )";

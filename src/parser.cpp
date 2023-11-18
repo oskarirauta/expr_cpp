@@ -2,8 +2,9 @@
 
 #include <map>
 
+#include "common.hpp"
+#include "logger.hpp"
 #include "eval/token.hpp"
-#include "eval/helpers.hpp"
 #include "eval/parser.hpp"
 
 static std::map<std::string, OP> Pattern1 = {
@@ -40,7 +41,7 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 
 	while ( !s.empty()) {
 
-		while ( is_space(s))
+		while ( common::is_space(s))
 			s.erase(0, 1);
 
 		if ( skip ) {
@@ -49,18 +50,18 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 			continue;
 		}
 
-		if ( is_alpha(s)) { /* names */
+		if ( common::is_alpha(s)) { /* names */
 
-			word += erase_front(s);
+			word += common::erase_front(s);
 
-			while ( is_alnum(s))
-				word += erase_front(s);
+			while ( common::is_alnum(s))
+				word += common::erase_front(s);
 
-			if ( s.size() >= 3 && s.starts_with("::") && is_alpha(s.at(2))) {
+			if ( s.size() >= 3 && s.starts_with("::") && common::is_alpha(s.at(2))) {
 
-				word += erase_prefix(s, 3);
-				while ( is_alnum(s))
-					word += erase_front(s);
+				word += common::erase_prefix(s, 3);
+				while ( common::is_alnum(s))
+					word += common::erase_front(s);
 			}
 
 			token.type = T_VARIABLE;
@@ -78,17 +79,17 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 			if ( token.type == T_VARIABLE )
 				token.name = word;
 
-		} else if ( is_digit(s) || ( s.front() == '.' && is_digit(s.at(1)))) { /* numbers */
+		} else if ( common::is_digit(s) || ( s.front() == '.' && common::is_digit(s.at(1)))) { /* numbers */
 
-			while ( is_digit(s))
-				word += erase_front(s);
+			while ( common::is_digit(s))
+				word += common::erase_front(s);
 
 			if ( s.front() == '.' ) {
 
-				word += erase_front(s);
+				word += common::erase_front(s);
 
-				while ( is_digit(s))
-					word += erase_front(s);
+				while ( common::is_digit(s))
+					word += common::erase_front(s);
 			}
 
 			token.type = T_NUMBER;
@@ -101,7 +102,7 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 
 		} else if ( s.front() == '\'' || s.front() == '"' ) { /* string */
 
-			quote = erase_front(s);
+			quote = common::erase_front(s);
 
 			while ( !s.empty() && s.front() != quote ) {
 
@@ -192,14 +193,14 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 							} else {
 								std::cout << "parser: illegal octal sequence '\\"
 									<< s.at(1) << s.at(2) << s.at(3) << "' in <" << expr << ">" << std::endl;
-								word += erase_front(s);
+								word += common::erase_front(s);
 							}
 							break;
 						default:
 							std::cout << "parser: unknown escape sequence '\\" << s.at(1) << "' in <" << expr << ">" << std::endl;
-							word += erase_front(s);
+							word += common::erase_front(s);
 					}
-				} else word += erase_front(s);
+				} else word += common::erase_front(s);
 			}
 
 			token.type = T_STRING;
@@ -224,7 +225,7 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 
 					token.type = T_OPERATOR;
 					token.op = op;
-					word = erase_prefix(s, key.size());
+					word = common::erase_prefix(s, key.size());
 					break;
 				}
 			}
@@ -244,7 +245,7 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 					if ( brace_level == 0 ) break;
 				}
 
-				child_expr += erase_front(s);
+				child_expr += common::erase_front(s);
 			}
 
 			if ( brace_level == 0 && !s.empty())
@@ -267,7 +268,7 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 		if ( !f_args && token.type == T_UNDEF && !s.empty())
 			s.erase(0, 1);
 
-		while ( is_space(s))
+		while ( common::is_space(s))
 			s.erase(0, 1);
 
 		tokens.push_back(token);
@@ -302,10 +303,10 @@ static const std::string describe(const std::vector<TOKEN>& tokens, bool f_args)
 				s += describe(tokens[i].op);
 				break;
 			case T_VARIABLE:
-				s += tolower(tokens[i].name);
+				s += common::to_lower(tokens[i].name);
 				break;
 			case T_FUNCTION:
-				s += tolower(tokens[i].name);
+				s += common::to_lower(tokens[i].name);
 				s += '(';
 				s += describe(tokens[i].args, true);
 				s += ')';
@@ -321,7 +322,7 @@ static const std::string describe(const std::vector<TOKEN>& tokens, bool f_args)
 			default:
 				if ( tokens[i].isNull()) s += "NULL";
 				else if ( tokens[i].isString()) s += "'" + std::get<std::string>(tokens[i].value) + "'";
-				else if ( tokens[i].isNumber()) s += double2str(std::get<double>(tokens[i].value));
+				else if ( tokens[i].isNumber()) s += common::to_string(std::get<double>(tokens[i].value));
 				else s += "UNK";
 		}
 	}

@@ -1,9 +1,10 @@
-#include <iostream>
 #include <stdexcept>
+#include <utility>
 
+#include "common.hpp"
+#include "logger.hpp"
 #include "eval/token.hpp"
 #include "eval/parser.hpp"
-#include "eval/helpers.hpp"
 #include "eval/evaluation.hpp"
 
 static const std::string find_function(const std::string& name, const FUNCTIONS *functions) {
@@ -12,7 +13,7 @@ static const std::string find_function(const std::string& name, const FUNCTIONS 
 		return "";
 
 	for ( const auto& [key, value] : *functions )
-		if ( tolower(key) == tolower(name))
+		if ( common::to_lower(std::as_const(key)) == common::to_lower(std::as_const(name)))
 			return key;
 
 	return "";
@@ -42,7 +43,7 @@ static const std::string find_variable(const std::string& name, const VARIABLES 
 		return "";
 
 	for ( const auto& [key, value] : *variables )
-		if ( tolower(key) == tolower(name))
+		if ( common::to_lower(std::as_const(key)) == common::to_lower(std::as_const(name)))
 			return key;
 
 	return "";
@@ -56,7 +57,7 @@ static const VARIABLE get_variable_value(const std::string& name, const VARIABLE
 		return result;
 
 	for ( const auto& [key, value] : *variables )
-		if ( tolower(key) == tolower(name))
+		if ( common::to_lower(std::as_const(key)) == common::to_lower(std::as_const(name)))
 			return value;
 
 	return result;
@@ -159,7 +160,7 @@ static std::vector<TOKEN> eval_functions(std::vector<TOKEN>& tokens, const FUNCT
 			FUNCTION_ARG arg = nullptr;
 
 			for ( const auto& [key, value] : *functions ) {
-				if ( tolower(key) == tolower(f_name)) {
+				if ( common::to_lower(std::as_const(key)) == common::to_lower(std::as_const(f_name))) {
 					arg = value(f_args);
 					break;
 				}
@@ -180,7 +181,7 @@ static std::vector<TOKEN> eval_functions(std::vector<TOKEN>& tokens, const FUNCT
 			return tokens;
 
 		} else {
-			std::cout << "evaluator: ignored unknown function " << tolower(tokens[i].name) << std::endl;
+			logger::warning << logger::tag("evaluator") << "ignored unknown function " << common::to_lower(std::as_const(tokens[i].name)) << std::endl;
 			tokens[i] = tok;
 			return tokens;
 		}

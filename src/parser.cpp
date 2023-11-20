@@ -7,19 +7,33 @@
 #include "eval/token.hpp"
 #include "eval/parser.hpp"
 
+// important note: longest operator patterns in the beginning, shortest in the end
 static std::map<std::string, OP> Pattern1 = {
 	{ "==", OP_NEQ },
 	{ "!=", OP_NNE },
 	{ "<=", OP_NLE },
+	{ "=<", OP_NLE },
 	{ ">=", OP_NGE },
-	{ "=", OP_SET },
-	{ "?", OP_CND },
+	{ "=>", OP_NGE },
+	{ "<", OP_NLT },
+	{ ">", OP_NGT },
+	{ "|", OP_OR },
+	{ "&", OP_AND },
+	{ "!", OP_NOT },
 	{ "+", OP_ADD },
 	{ "-", OP_SUB },
 	{ ".", OP_CAT },
-	{ ",", OP_COM }
+	{ "*", OP_MUL },
+	{ "/", OP_DIV },
+	{ ",", OP_COM },
+	{ "%", OP_MOD },
+	{ "^", OP_POW },
+/* // Handling this differently..
+	{ "=", OP_SET },
+*/
 };
 
+// important note: longest operator patterns in the beginning, shortest in the end
 static std::map<std::string, OP> Pattern2 = {
 	{ "eq", OP_SEQ },
 	{ "ne", OP_SNE },
@@ -33,7 +47,6 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 
 	std::string s(expr);
 	std::vector<TOKEN> tokens;
-	int skip = 0;
 	unsigned char quote = 0;
 	std::string word;
 
@@ -41,14 +54,13 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 
 	while ( !s.empty()) {
 
+		token.reset();
+
 		while ( common::is_space(s))
 			s.erase(0, 1);
 
-		if ( skip ) {
-			s.erase(0, 1);
-			skip--;
-			continue;
-		}
+		if ( s.empty())
+			break;
 
 		if ( common::is_alpha(s)) { /* names */
 
@@ -96,7 +108,7 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 			try {
 				token.value = std::stod(word);
 			} catch ( std::invalid_argument& e ) {
-				std::cout << "parser: error, cannot convert '" << word << "' to number" << std::endl;
+				logger::error << logger::tag("parser") << "cannot convert '" << word << "' to number" << std::endl;
 				token.value = (double)0;
 			}
 
@@ -170,14 +182,16 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 										s.erase(0, 4);
 										break;
 									default:
-										std::cout << "parser: Illegal hex sequence '\\x" << s.at(2) << "' in <" << expr <<
-												"> keeps unchanged" << std::endl;
+										logger::warning << logger::tag("parser") <<
+												"Illegal hex sequence '\\x" << s.at(2) << "' in <" <<
+												expr << "> keeps unchanged" << std::endl;
 										hexC = '\\';
 										s.erase(0, 1);
 								}
 
 								if ( hexC == 0 )
-									std::cout << "parser: Null character(s) in <" << expr << "> will be ignored" << std::endl;
+									logger::warning << logger::tag("parser") <<
+											"Null character(s) in <" << expr << "> will be ignored" << std::endl;
 								else word += hexC;
 							}
 							break;
@@ -191,13 +205,17 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 								word += (( s.at(1) - '0' ) * 64 + ( s.at(2) - '0' ) * 8 + ( s.at(3) - '0' ));
 								s.erase(0, 4);
 							} else {
-								std::cout << "parser: illegal octal sequence '\\"
-									<< s.at(1) << s.at(2) << s.at(3) << "' in <" << expr << ">" << std::endl;
+								logger::warning << logger::tag("parser") <<
+											"illegal octal sequence '\\" <<
+											s.at(1) << s.at(2) << s.at(3) <<
+											"' in <" << expr << ">" << std::endl;
 								word += common::erase_front(s);
 							}
 							break;
 						default:
-							std::cout << "parser: unknown escape sequence '\\" << s.at(1) << "' in <" << expr << ">" << std::endl;
+							logger::warning << logger::tag("parser") <<
+									"unknown escape sequence '\\" << s.at(1) <<
+									"' in <" << expr << ">" << std::endl;
 							word += common::erase_front(s);
 					}
 				} else word += common::erase_front(s);
@@ -208,52 +226,92 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 			if ( s.front() == quote )
 				s.erase(0, 1);
 			else
-				std::cout << "parser: unterminated string in <" << expr << ">" << std::endl;
+				logger::warning << logger::tag("parser") <<
+						"unterminated string in <" << expr << ">" << std::endl;
 
 			token.value = word;
 
 		} else { /* non-alpha operators */
+
+			bool skip = false;
 
 			for ( const auto& [key, op] : Pattern1 ) {
 
 				if ( s.size() >= key.size() && s.starts_with(key)) {
 
 					if ( op == OP_COM && !f_args ) {
-						std::cout << "parser: comma operator is allowed only when defining function arguments <" << expr << ">" << std::endl;
+						logger::warning << logger::tag("parser") <<
+							"comma operator is allowed only when defining function arguments <" << expr << ">" << std::endl;
 						continue;
 					}
 
 					token.type = T_OPERATOR;
 					token.op = op;
 					word = common::erase_prefix(s, key.size());
+
+					if ( token.op == OP_NOT && !tokens.empty() && tokens.back().type == T_OPERATOR &&
+						tokens.back().op == OP_NOT ) {
+						logger::error << logger::tag("parser") <<
+							"multiple NOT(!) operators in sequence are not allowed, if you must use them, " <<
+							"place them inside parentheses, ignoring operator now" << std::endl;
+						skip = true;
+					} else if ( token.op == OP_SUB && !tokens.empty() && tokens.back().type == T_OPERATOR &&
+						tokens.back().op == OP_NOT ) {
+						logger::error << logger::tag("parser") <<
+							"operator SGN(-) is not allowed to follow operator NOT(!), if you must use NOT " <<
+							"on negative value, place value inside parentheses, ignoring now" << std::endl;
+						skip = true;
+					} else if ( token.op == OP_NOT && !tokens.empty() && tokens.back().type == T_OPERATOR &&
+						tokens.back().op == OP_SUB ) {
+						logger::error << logger::tag("parser") <<
+							"operator NOT(!) is not allowed to follow operator SGN or SUB (-), if you must " <<
+							"use it, place NOT expression inside parentheses, ignoring now" << std::endl;
+						skip = true;
+					}
+
 					break;
 				}
 			}
+
+			if ( skip ) {
+				token.reset();
+				word = "";
+				continue;
+			}
+
 		}
 
-		if ( !s.empty() && s.front() == '(' ) {
+		if ( !s.empty() && s.front() == '(' && (
+			( token.type != T_OPERATOR && token.op != OP_SUB )
+			)) {
 
+			bool escaping = false;
+			char quote = 0;
 			int brace_level = 1;
 			std::string child_expr;
 
 			s.erase(0, 1);
 			while ( !s.empty() && brace_level > 0 ) {
 
-				if ( s.front() == '(' ) brace_level++;
-				else if ( s.front() == ')' ) {
+				if ( quote == 0 && ( s.front() == '\'' || s.front() == '"' )) quote = s.front();
+				else if ( quote != 0 && !escaping && s.front() == '\\' ) escaping = true;
+				else if ( quote != 0 && !escaping && s.front() == quote ) quote = 0;
+				else if ( quote == 0 && s.front() == '(' ) brace_level++;
+				else if ( quote == 0 && s.front() == ')' ) {
 					brace_level--;
-					if ( brace_level == 0 ) break;
-				}
+					if ( brace_level == 0 ) {
+						s.erase(0, 1);
+						break;
+					}
+				} else if ( escaping ) escaping = false;
 
 				child_expr += common::erase_front(s);
 			}
 
-			if ( brace_level == 0 && !s.empty())
-				s.erase(0, 1);
-			else std::cout << "parser: uneven braces in <" << expr << ">" << std::endl;
+			if ( brace_level != 0 )
+				logger::warning << logger::tag("parser") << "uneven braces in <" << expr << ">" << std::endl;
 
 			if ( token.type == T_VARIABLE ) {
-
 				token.type = T_FUNCTION;
 				token.args = parse(child_expr, true);
 
@@ -261,8 +319,108 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 
 				token.type = T_SUB;
 				token.child = parse(child_expr, false);
-				word += child_expr;
 			}
+		}
+
+		if ( !s.empty() && s.front() == '?' && token.type == T_UNDEF ) {
+
+			bool escaping = false;
+			char quote = 0;
+			int brace_level = 0;
+			std::string expr1;
+			std::string expr2;
+			bool cnd_complete = false;
+
+			s.erase(0, 1);
+
+			while (common::is_space(s))
+				s.erase(0, 1);
+
+			while ( !s.empty() && !cnd_complete ) {
+
+				if ( quote == 0 && ( s.front() == '\'' || s.front() == '"' )) quote = s.front();
+				else if ( quote != 0 && !escaping && s.front() == '\\' ) escaping = true;
+				else if ( quote != 0 && !escaping && s.front() == quote ) quote = 0;
+				else if ( quote == 0 && s.front() == '(' )
+					brace_level++;
+				else if ( quote == 0 && s.front() == ')' )
+					brace_level--;
+				else if ( quote == 0 && brace_level == 0 && s.front() == ':' ) {
+					cnd_complete = true;
+					s.erase(0, 1);
+					break;
+				} else if ( escaping ) escaping = false;
+
+				expr1 += common::erase_front(s);
+			}
+
+			if ( !cnd_complete ) {
+				if ( quote != 0 )
+					logger::error << logger::tag("parser") << "uneven quotes inside condition <" << expr << ">" << std::endl;
+				else if ( brace_level != 0 )
+					logger::error << logger::tag("parser") << "uneven braces inside condition <" << expr << ">" << std::endl;
+				else {
+					logger::error << logger::tag("parser") << "invalid condition, operator COL(:) and false result missing, " <<
+						"syntax is x( != 0 ) ? true : false" << std::endl;
+					logger::verbose << logger::tag("parser") << "invalid condition found from <" << expr << ">" << std::endl;
+				}
+
+				// todo: cancel here..
+			}
+
+			if ( expr1.empty()) {
+				logger::error << logger::tag("parser") << "error, conditionals true result is null <" << expr << " >" << std::endl;
+				expr1 = "0";
+			}
+
+			while (common::is_space(s))
+                                s.erase(0, 1);
+
+			escaping = false;
+			quote = 0;
+			brace_level = 0;
+			cnd_complete = false;
+
+			while ( !s.empty() && !cnd_complete ) {
+
+				if ( quote == 0 && ( s.front() == '\'' || s.front() == '"' )) quote = s.front();
+				else if ( quote != 0 && !escaping && s.front() == '\\' ) escaping = true;
+				else if ( quote != 0 && !escaping && s.front() == quote ) quote = 0;
+				else if ( quote == 0 && s.front() == '(' )
+					brace_level++;
+				else if ( quote == 0 && s.front() == ')' )
+					brace_level--;
+				else if ( quote == 0 && brace_level == 0 && s.front() == ' ' ) {
+					cnd_complete = true;
+					s.erase(0, 1);
+					break;
+				} else if ( escaping ) escaping = false;
+
+                                expr2 += common::erase_front(s);
+                        }
+
+			if ( s.empty() && quote == 0 && brace_level == 0 )
+				cnd_complete = true;
+
+			if ( !cnd_complete ) {
+				if ( quote != 0 )
+					logger::error << logger::tag("parser") << "uneven quotes inside condition <" << expr << ">" << std::endl;
+				else if ( brace_level != 0 )
+					logger::error << logger::tag("parser") << "uneven braces inside condition <" << expr << ">" << std::endl;
+				else
+					logger::error << logger::tag("parser") << "unknown condition parsing error with < " << expr << ">" << std::endl;
+
+				// todo: cancel here
+			}
+
+			if ( expr2.empty()) {
+				logger::error << logger::tag("parser") << "error, conditionals false result is null <" << expr << " >" << std::endl;
+				expr2 = "0";
+			}
+
+			token.type = T_CONDITIONAL;
+			token.cond1 = parse(expr1, false);
+			token.cond2 = parse(expr2, false);
 		}
 
 		if ( !f_args && token.type == T_UNDEF && !s.empty())
@@ -315,6 +473,15 @@ static const std::string describe(const std::vector<TOKEN>& tokens, bool f_args)
 				s += "( ";
 				s += describe(tokens[i].child, false);
 				s += " )";
+				break;
+			case T_CONDITIONAL:
+				s += "?";
+				if ( tokens[i].cond1.size() == 1 )
+					s += " " + describe(tokens[i].cond1, false) + " :";
+				else s += " ( " + describe(tokens[i].cond1, false) + " ) :";
+				if ( tokens[i].cond2.size() == 1 )
+					s += " " + describe(tokens[i].cond2, false);
+				else s += " ( " + describe(tokens[i].cond2, false) + " )";
 				break;
 			case T_UNDEF:
 				s += "T_UNDEF";

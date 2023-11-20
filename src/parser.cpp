@@ -330,6 +330,7 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 			std::string expr1;
 			std::string expr2;
 			bool cnd_complete = false;
+			bool abort = false;
 
 			s.erase(0, 1);
 
@@ -365,10 +366,10 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 					logger::verbose << logger::tag("parser") << "invalid condition found from <" << expr << ">" << std::endl;
 				}
 
-				// todo: cancel here..
+				abort = true;
 			}
 
-			if ( expr1.empty()) {
+			if ( !abort && expr1.empty()) {
 				logger::error << logger::tag("parser") << "error, conditionals true result is null <" << expr << " >" << std::endl;
 				expr1 = "0";
 			}
@@ -381,7 +382,7 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 			brace_level = 0;
 			cnd_complete = false;
 
-			while ( !s.empty() && !cnd_complete ) {
+			while ( !abort && !s.empty() && !cnd_complete ) {
 
 				if ( quote == 0 && ( s.front() == '\'' || s.front() == '"' )) quote = s.front();
 				else if ( quote != 0 && !escaping && s.front() == '\\' ) escaping = true;
@@ -399,10 +400,10 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
                                 expr2 += common::erase_front(s);
                         }
 
-			if ( s.empty() && quote == 0 && brace_level == 0 )
+			if ( !abort && s.empty() && quote == 0 && brace_level == 0 )
 				cnd_complete = true;
 
-			if ( !cnd_complete ) {
+			if ( !abort && !cnd_complete ) {
 				if ( quote != 0 )
 					logger::error << logger::tag("parser") << "uneven quotes inside condition <" << expr << ">" << std::endl;
 				else if ( brace_level != 0 )
@@ -410,17 +411,21 @@ static std::vector<TOKEN> parse(const std::string& expr, bool f_args) {
 				else
 					logger::error << logger::tag("parser") << "unknown condition parsing error with < " << expr << ">" << std::endl;
 
-				// todo: cancel here
+				abort = true;
 			}
 
-			if ( expr2.empty()) {
+			if ( !abort && expr2.empty()) {
 				logger::error << logger::tag("parser") << "error, conditionals false result is null <" << expr << " >" << std::endl;
 				expr2 = "0";
 			}
 
-			token.type = T_CONDITIONAL;
-			token.cond1 = parse(expr1, false);
-			token.cond2 = parse(expr2, false);
+			if ( !abort ) {
+				token.type = T_CONDITIONAL;
+				token.cond1 = parse(expr1, false);
+				token.cond2 = parse(expr2, false);
+			}
+
+			s += "   "; // Add some white-space, next part may remove it..
 		}
 
 		if ( !f_args && token.type == T_UNDEF && !s.empty())

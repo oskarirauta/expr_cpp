@@ -139,6 +139,6 @@ const std::string describe(const expr::OP& op);
 const std::string describe(const expr::TOKEN& token);
 const std::string describe(const std::vector<expr::TOKEN>& tokens);
 
-std::ostream& operator <<(std::ostream& os, expr::TYPE const &t);
+std::ostream& operator <<(std::ostream& os, expr::TYPE const& t);
 std::ostream& operator <<(std::ostream& os, expr::OP const& o);
-std::ostream& operator <<(std::ostream& os, std::vector<expr::TOKEN>& tokens);
+std::ostream& operator <<(std::ostream& os, std::vector<expr::TOKEN> const& tokens);

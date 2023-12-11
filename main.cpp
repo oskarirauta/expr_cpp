@@ -1,0 +1,146 @@
+#include <iostream>
+#include <map>
+#include <string>
+#include <stdexcept>
+
+#include "expr/expression.hpp"
+#include "logger.hpp"
+
+#include <cmath>
+
+
+#include "common.hpp"
+#include "lowercase_map.hpp"
+
+expr::VARIABLE hello(expr::FUNCTION_ARGS args) {
+
+	expr::VARIABLE ret = 0;
+	int i = 0;
+
+	for ( expr::VARIABLE& arg : args ) {
+		i++;
+		if ( arg == expr::V_NULLPTR )
+			std::cout << "problem: arg #" << i << " is null" << std::endl;
+		else if ( arg == expr::V_STRING )
+			std::cout << "problem: arg #" << i << " is string (" << (std::string)arg << ")" << std::endl;
+		else if ( arg == expr::V_NUMBER )
+			ret = (double)ret + (double)arg;
+		else std::cout << "hello function: error with arg#" << i << ": unknown arg type" << std::endl;
+	}
+
+	return ret;
+}
+
+int main(int argc, char **argv) {
+
+	logger::loglevel(logger::debug);
+
+	std::cout << "evaluator++\n" << std::endl;
+
+	//std::string s = "1";
+	//std::string s = "  hello::a+   world 123 + 456\t'str1' \"str2\" func1() + func2('hello', 'world') + ('sub1' + 'sub2')";
+	//std::string s = "    999 +  1 + 1 + ( 5 + 2 )";
+	//std::string s = "1 + hello(1, 2, 5 + 6 + 9, (7 + 2))";
+	//std::string s = "1 + hello((1 + 1), 1 + ( 1 + 1), 1, 1 + hello(1, 1))";
+	//std::string s = "(1+1)";
+	//std::string s = "(xxx)";
+	//std::string s = "hello(1,1, 1 + 1)";
+	//std::string s = "hello(1, hello(1, hello(1)), 1) + 1 + hello(1 + xxx)";
+	//std::string s = "xxx";
+	//std::string s = "hello(xxx)";
+	//std::string s = "xxx + ( 10 + xxx + xxx + hello(xxx))";
+	//std::string s = "xxx + ( 10 + 10 )";
+	//std::string s = "xxx + 10 + 10";
+	//std::string s = "10 - 5";
+	//std::string s = "'hello' . ' ' . 'world'";
+	//std::string s = "'1' . '0' + 10";
+	//std::string s = "-1";
+	//std::string s = "-0";
+	//std::string s = "-(1 + 9)";
+	//std::string s = "-(-10 + 2)";
+	//std::string s = "5 + - - - 4";
+	//std::string s = "- - - - 5";
+	//std::string s = "2 * 5";
+	//std::string s = "10 / 0";
+	//std::string s = "0 / 10";
+	//std::string s = "10 / 2";
+	//std::string s = "1 < 0";
+	//std::string s = "bb ? ( 'hello ' . 'world' ) : 'not today'";
+	//std::string s = "? 1 : 0";
+
+	//std::string s = "Z = 150";
+	//std::string s = "!10";
+	//std::string s = "!-10";
+	//std::string s = "!!!!!!!!10";
+	//std::string s = "!!!!!!!!-10";
+
+	//std::string s = "1 ++ 1";
+	//std::string s = "myvar = 'hello'";
+
+	std::string s = "         myvar     = 'hello'";
+	//std::string s = "s";
+
+	expr::expression e(s);
+
+	std::string pretty = describe(e);
+	std::cout << "dirty: " << e.raw() << std::endl;
+	std::cout << "expression: " << e << std::endl;
+
+	expr::FUNCTIONMAP functions = {
+		{ "hello", hello }
+	};
+
+	expr::VARIABLEMAP variables = {
+		{ "xxx", (double)10 },
+		{ "bb", (double)1 },
+		{ "s", "hello world" },
+	};
+
+	expr::TOKEN token;
+
+	try {
+		token = e.evaluate(&functions, &variables);
+	} catch ( std::runtime_error &e ) {
+		token = expr::TOKEN::UNDEF();
+		std::cout << "runtime error, " << e.what() << std::endl;
+	}
+
+	std::cout << "result: " << token << " description: " << describe(token) << std::endl;
+/*
+	if ( token.type() == expr::T_NUMBER )
+		std::cout << token.to_double() << ( token.to_double() == 0 ? " (zero)" : "" ) << std::endl;
+	else if ( token.type() == expr::T_STRING )
+		std::cout << token.to_string() << std::endl;
+	else std::cout << "undef(error)" << std::endl;
+*/
+	common::lowercase_map<std::string> m = {
+		{ "C", "added1" },
+		{ "D", "added2" }
+	};
+
+	std::string k = "d";
+
+	for ( auto& [key, value] : m )
+		std::cout << "[" << key << "] = " << value << std::endl;
+
+	m["c"] = "pre1";
+	m["C"] = "modified1";
+	std::cout << "[ c ] = " << m["C"] << std::endl;
+	std::cout << "[ " << k << " ] = " << m[k] << std::endl;
+
+	expr::VARIABLE v;
+	v = (double)10;
+	v = "hello world";
+	v = "11";
+	std::cout << "variable2: " << v << std::endl;
+
+	int n = v;
+	double d = v;
+	std::cout << "inline int: " << (int)v <<
+		" int: " << n <<
+		" double: " << d << std::endl;
+
+	std::cout << "variable myvar: " << variables["myvar"] << std::endl;
+
+	return 0;
+}

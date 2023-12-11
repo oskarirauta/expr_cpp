@@ -31,7 +31,10 @@ common: [https://github.com/oskarirauta/common_cpp.git](https://github.com/oskar
 logger: [https://github.com/oskarirauta/logcpp.git](https://github.com/oskarirauta/logcpp)
 
 ### status
-WIP
+Works for now
+
+### ideas
+A sanitizer for expression, expressions with errors enough might end-up in a disaster by failure.
 
 ### license
 MIT

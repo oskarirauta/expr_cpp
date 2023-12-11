@@ -7,11 +7,10 @@
 #include "lowercase_map.hpp"
 #include "expr/variable.hpp"
 #include "expr/function.hpp"
+#include "expr/result.hpp"
 #include "expr/token.hpp"
 
 namespace expr {
-
-	// enum VAL_TYPE { V_UNDEF, V_NUMBER, V_STRING, V_NULLPTR };
 
 	class expression {
 

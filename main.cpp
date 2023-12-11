@@ -90,15 +90,15 @@ int main(int argc, char **argv) {
 		{ "s", "hello world" },
 	};
 
-	expr::TOKEN token;
+	expr::RESULT result;
 
 	try {
-		token = e.evaluate(&functions, &variables);
+		result = e.evaluate(&functions, &variables);
 	} catch ( std::runtime_error &e ) {
-		token = expr::TOKEN::UNDEF();
+		result = nullptr;
 		std::cout << "runtime error, " << e.what() << std::endl;
 	}
 
-	std::cout << "result: " << token << " description: " << describe(token) << std::endl;
+	std::cout << "result: " << result << " description: " << describe(result) << std::endl;
 	return 0;
 }

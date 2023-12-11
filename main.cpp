@@ -3,14 +3,8 @@
 #include <string>
 #include <stdexcept>
 
-#include "expr/expression.hpp"
 #include "logger.hpp"
-
-#include <cmath>
-
-
-#include "common.hpp"
-#include "lowercase_map.hpp"
+#include "expr/expression.hpp"
 
 expr::VARIABLE hello(expr::FUNCTION_ARGS args) {
 
@@ -106,41 +100,5 @@ int main(int argc, char **argv) {
 	}
 
 	std::cout << "result: " << token << " description: " << describe(token) << std::endl;
-/*
-	if ( token.type() == expr::T_NUMBER )
-		std::cout << token.to_double() << ( token.to_double() == 0 ? " (zero)" : "" ) << std::endl;
-	else if ( token.type() == expr::T_STRING )
-		std::cout << token.to_string() << std::endl;
-	else std::cout << "undef(error)" << std::endl;
-*/
-	common::lowercase_map<std::string> m = {
-		{ "C", "added1" },
-		{ "D", "added2" }
-	};
-
-	std::string k = "d";
-
-	for ( auto& [key, value] : m )
-		std::cout << "[" << key << "] = " << value << std::endl;
-
-	m["c"] = "pre1";
-	m["C"] = "modified1";
-	std::cout << "[ c ] = " << m["C"] << std::endl;
-	std::cout << "[ " << k << " ] = " << m[k] << std::endl;
-
-	expr::VARIABLE v;
-	v = (double)10;
-	v = "hello world";
-	v = "11";
-	std::cout << "variable2: " << v << std::endl;
-
-	int n = v;
-	double d = v;
-	std::cout << "inline int: " << (int)v <<
-		" int: " << n <<
-		" double: " << d << std::endl;
-
-	std::cout << "variable myvar: " << variables["myvar"] << std::endl;
-
 	return 0;
 }

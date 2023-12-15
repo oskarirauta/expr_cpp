@@ -71,6 +71,6 @@ expr::RESULT::RESULT(const expr::VARIABLE& v) {
 	else this -> emplace<std::nullptr_t>(std::forward<decltype(nullptr)>(nullptr));
 }
 
-const std::string describe(const expr::RESULT& r); {
+const std::string describe(const expr::RESULT& r) {
 	return r.describe();
 }

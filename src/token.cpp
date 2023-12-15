@@ -51,7 +51,7 @@ const double expr::TOKEN::raw_double() const {
 	try {
 		return std::get<double>(this -> _value);
 	} catch ( std::bad_variant_access const& e ) {
-		logger::error << logger::tag("convert") << "raw get number failed: " << e.what() << std::endl;
+		logger::error["convert"] << "raw get number failed: " << e.what() << std::endl;
 	}
 
 	return 0;
@@ -65,7 +65,7 @@ const std::string expr::TOKEN::raw_string() const {
 	try {
 		return std::get<std::string>(this -> _value);
 	} catch ( std::bad_variant_access const& e ) {
-		logger::error << logger::tag("convert") << "raw get string failed: " << e.what() << std::endl;
+		logger::error["convert"] << "raw get string failed: " << e.what() << std::endl;
 	}
 	return "";
 }
@@ -118,15 +118,15 @@ expr::TOKEN::operator double() const {
 		try {
 			n = std::stod(s);
 		} catch ( std::invalid_argument& e ) {
-			logger::error << logger::tag("convert") <<
-					"failed to convert string token '" << s <<
-					"' to number value" << std::endl;
+			logger::error["convert"] <<
+				"failed to convert string token '" << s <<
+				"' to number value" << std::endl;
 			n = (double)0;
 		}
 	} else if ( this -> is_null()) {
 		n = 0;
 	} else {
-		logger::error << logger::tag("convert") << "failed to convert token to number value" << std::endl;
+		logger::error["convert"] << "failed to convert token to number value" << std::endl;
 		n = 0;
 	}
 
@@ -146,12 +146,10 @@ expr::TOKEN::operator std::string() const {
 	} else if ( this -> is_number()) {
 		s = common::to_string(this -> raw_double());
 	} else if ( this -> is_null()) {
-		logger::vverbose << logger::tag("convert") <<
-			"converted nullptr to value ''" << std::endl;
+		logger::vverbose["convert"] << "converted nullptr to value ''" << std::endl;
 		s = "null";
 	} else {
-		logger::error << logger::tag("convert") <<
-			"casting token to string value failed, using value ''" << std::endl;
+		logger::error["convert"] << "casting token to string value failed, using value ''" << std::endl;
 	}
 
 	return s;

@@ -103,7 +103,7 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 			try {
 				token = std::stod(word);
 			} catch ( std::invalid_argument& e ) {
-				logger::error << logger::tag("parser") << "cannot convert '" << word << "' to number" << std::endl;
+				logger::error["parser"] << "cannot convert '" << word << "' to number" << std::endl;
 				token = (double)0;
 			}
 
@@ -177,16 +177,16 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 										s.erase(0, 4);
 										break;
 									default:
-										logger::warning << logger::tag("parser") <<
-												"Illegal hex sequence '\\x" << s.at(2) << "' in <" <<
-												expr << "> keeps unchanged" << std::endl;
+										logger::warning["parser"] <<
+											"Illegal hex sequence '\\x" << s.at(2) << "' in <" <<
+											expr << "> keeps unchanged" << std::endl;
 										hexC = '\\';
 										s.erase(0, 1);
 								}
 
 								if ( hexC == 0 )
-									logger::warning << logger::tag("parser") <<
-											"Null character(s) in <" << expr << "> will be ignored" << std::endl;
+									logger::warning["parser"] <<
+										"Null character(s) in <" << expr << "> will be ignored" << std::endl;
 								else word += hexC;
 							}
 							break;
@@ -200,17 +200,17 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 								word += (( s.at(1) - '0' ) * 64 + ( s.at(2) - '0' ) * 8 + ( s.at(3) - '0' ));
 								s.erase(0, 4);
 							} else {
-								logger::warning << logger::tag("parser") <<
-											"illegal octal sequence '\\" <<
-											s.at(1) << s.at(2) << s.at(3) <<
-											"' in <" << expr << ">" << std::endl;
+								logger::warning["parser"] <<
+									"illegal octal sequence '\\" <<
+									s.at(1) << s.at(2) << s.at(3) <<
+									"' in <" << expr << ">" << std::endl;
 								word += common::erase_front(s);
 							}
 							break;
 						default:
-							logger::warning << logger::tag("parser") <<
-									"unknown escape sequence '\\" << s.at(1) <<
-									"' in <" << expr << ">" << std::endl;
+							logger::warning["parser"] <<
+								"unknown escape sequence '\\" << s.at(1) <<
+								"' in <" << expr << ">" << std::endl;
 							word += common::erase_front(s);
 					}
 				} else word += common::erase_front(s);
@@ -221,8 +221,8 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 			if ( s.front() == quote )
 				s.erase(0, 1);
 			else
-				logger::warning << logger::tag("parser") <<
-						"unterminated string in <" << expr << ">" << std::endl;
+				logger::warning["parser"] <<
+					"unterminated string in <" << expr << ">" << std::endl;
 
 			token._value = word;
 
@@ -235,7 +235,7 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 				if ( s.size() >= key.size() && s.starts_with(key)) {
 
 					if ( op == expr::OP_COM && !f_args ) {
-						logger::warning << logger::tag("parser") <<
+						logger::warning["parser"] <<
 							"comma operator is allowed only when defining function arguments <" << expr << ">" << std::endl;
 						continue;
 					}
@@ -258,7 +258,7 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 						tokens.back() = expr::OP_NOT;
 						skip = true;
 					} else if ( token == expr::OP_NOT && !tokens.empty() && tokens.back() == expr::OP_SUB ) {
-						logger::error << logger::tag("parser") <<
+						logger::error["parser"] <<
 							"operator NOT(!) is not allowed to follow operator SGN or SUB (-), if you must " <<
 							"use it, place NOT expression inside parentheses, ignoring NOT(!) now" << std::endl;
 						skip = true;
@@ -302,7 +302,7 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 			}
 
 			if ( brace_level != 0 )
-				logger::warning << logger::tag("parser") << "uneven braces in <" << expr << ">" << std::endl;
+				logger::warning["parser"] << "uneven braces in <" << expr << ">" << std::endl;
 
 			if ( token == expr::T_VARIABLE ) {
 				token = expr::T_FUNCTION;
@@ -350,20 +350,20 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 
 			if ( !cnd_complete ) {
 				if ( quote != 0 )
-					logger::error << logger::tag("parser") << "uneven quotes inside condition <" << expr << ">" << std::endl;
+					logger::error["parser"] << "uneven quotes inside condition <" << expr << ">" << std::endl;
 				else if ( brace_level != 0 )
-					logger::error << logger::tag("parser") << "uneven braces inside condition <" << expr << ">" << std::endl;
+					logger::error["parser"] << "uneven braces inside condition <" << expr << ">" << std::endl;
 				else {
-					logger::error << logger::tag("parser") << "invalid condition, operator COL(:) and false result missing, " <<
+					logger::error["parser"] << "invalid condition, operator COL(:) and false result missing, " <<
 						"syntax is x( != 0 ) ? true : false" << std::endl;
-					logger::verbose << logger::tag("parser") << "invalid condition found from <" << expr << ">" << std::endl;
+					logger::verbose["parser"] << "invalid condition found from <" << expr << ">" << std::endl;
 				}
 
 				abort = true;
 			}
 
 			if ( !abort && expr1.empty()) {
-				logger::error << logger::tag("parser") << "error, conditionals true result is null <" << expr << " >" << std::endl;
+				logger::error["parser"] << "error, conditionals true result is null <" << expr << " >" << std::endl;
 				expr1 = "0";
 			}
 
@@ -398,17 +398,17 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 
 			if ( !abort && !cnd_complete ) {
 				if ( quote != 0 )
-					logger::error << logger::tag("parser") << "uneven quotes inside condition <" << expr << ">" << std::endl;
+					logger::error["parser"] << "uneven quotes inside condition <" << expr << ">" << std::endl;
 				else if ( brace_level != 0 )
-					logger::error << logger::tag("parser") << "uneven braces inside condition <" << expr << ">" << std::endl;
+					logger::error["parser"] << "uneven braces inside condition <" << expr << ">" << std::endl;
 				else
-					logger::error << logger::tag("parser") << "unknown condition parsing error with < " << expr << ">" << std::endl;
+					logger::error["parser"] << "unknown condition parsing error with < " << expr << ">" << std::endl;
 
 				abort = true;
 			}
 
 			if ( !abort && expr2.empty()) {
-				logger::error << logger::tag("parser") << "error, conditionals false result is null <" << expr << " >" << std::endl;
+				logger::error["parser"] << "error, conditionals false result is null <" << expr << " >" << std::endl;
 				expr2 = "0";
 			}
 
@@ -437,7 +437,7 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 				( token == expr::OP_NOT && tokens.back() == expr::OP_SUB ) ||
 				( token == expr::OP_NNOT && tokens.back() == expr::OP_SUB ))) {
 
-				logger::warning << logger::tag("parser") << "2 mathematical modifier operators ( " << describe(token._op) <<
+				logger::warning["parser"] << "2 mathematical modifier operators ( " << describe(token._op) <<
 					" and " << describe(tokens.back()._op) << " cannot be in row, ignoring operator " <<
 					describe(token._op) << std::endl;
 
@@ -474,7 +474,7 @@ bool expr::expression::validate_set_op(std::vector<expr::TOKEN>& tokens, const s
 			else if ( tokens[0] == T_VARIABLE && tokens.size() > 2 &&
 				tokens[2] == OP_SET ) {
 
-				logger::warning << logger::tag("validator") << "multiple SET operators in sequence, removing " <<
+				logger::warning["validator"] << "multiple SET operators in sequence, removing " <<
 					"extra operators <" << expr << ">" << std::endl;
 
 					while ( tokens.size() > 2 && tokens[2] == OP_SET )
@@ -486,7 +486,7 @@ bool expr::expression::validate_set_op(std::vector<expr::TOKEN>& tokens, const s
 
 			} else if ( tokens[0] != expr::T_VARIABLE || tokens[0]._name.empty()) {
 
-				logger::error << logger::tag("validator") << "SET operator used, but left side " <<
+				logger::error["validator"] << "SET operator used, but left side " <<
 					"argument's type is not a variable, ignoring SET <" << expr << ">" << std::endl;
 
 				tokens.erase(tokens.begin(), tokens.begin() + 2);
@@ -496,7 +496,7 @@ bool expr::expression::validate_set_op(std::vector<expr::TOKEN>& tokens, const s
 
 			} else if ( tokens.size() == 2 ) {
 
-				logger::error << logger::tag("validator") << "SET operator used, but right side " <<
+				logger::error["validator"] << "SET operator used, but right side " <<
 					"argument is missing, ignoring SET <" << expr << ">" << std::endl;
 
 				tokens.erase(tokens.begin() + 1);
@@ -505,7 +505,7 @@ bool expr::expression::validate_set_op(std::vector<expr::TOKEN>& tokens, const s
 				break;
 			}
 
-			logger::error << logger::tag("validator") << "SET operator used and unexpected unknown " <<
+			logger::error["validator"] << "SET operator used and unexpected unknown " <<
 				"error occurred, ignoring SET <" << expr << ">" << std::endl;
 			tokens.erase(tokens.begin() + 1);
 			result = false;
@@ -515,7 +515,7 @@ bool expr::expression::validate_set_op(std::vector<expr::TOKEN>& tokens, const s
 
 		if ( is_root && i == 0 && tokens[i] == T_OPERATOR && tokens[i] == OP_SET ) {
 
-			logger::error << logger::tag("validator") << "SET operator used, but left side " <<
+			logger::error["validator"] << "SET operator used, but left side " <<
 				"argument's type is not a variable, ignoring SET <" << expr << ">" << std::endl;
 
 			tokens.erase(tokens.begin());
@@ -526,9 +526,9 @@ bool expr::expression::validate_set_op(std::vector<expr::TOKEN>& tokens, const s
 
 		if ( tokens[i] == T_OPERATOR && tokens[i] == OP_SET ) {
 
-			logger::error << logger::tag("validator") << "SET operator in wrong place, SET can " <<
+			logger::error["validator"] << "SET operator in wrong place, SET can " <<
 				"only be used in beginning of expression as second argument after variable argument" << std::endl;
-			logger::error << logger::tag("validator") << "ignoring SET <" << expr << ">" << std::endl;
+			logger::error["validator"] << "ignoring SET <" << expr << ">" << std::endl;
 
 			tokens.erase(i == 0 ? tokens.begin() : ( tokens.begin() + ( i + 1 )));
 			result = false;
@@ -541,13 +541,13 @@ bool expr::expression::validate_set_op(std::vector<expr::TOKEN>& tokens, const s
 			if ( !tokens[i]._cond1.empty() && !validate_set_op(tokens[i]._cond1, expr, false)) {
 
 				result = false;
-				logger::vverbose << logger::tag("validator") << "SET expression failure in conditionals true result" << std::endl;
+				logger::vverbose["validator"] << "SET expression failure in conditionals true result" << std::endl;
 				break;
 
 			} else if ( !validate_set_op(tokens[i]._cond2, expr, false)) {
 
 				result = false;
-				logger::vverbose << logger::tag("validator") << "SET expression failure in conditionals false result" << std::endl;
+				logger::vverbose["validator"] << "SET expression failure in conditionals false result" << std::endl;
 				break;
 			}
 
@@ -555,7 +555,7 @@ bool expr::expression::validate_set_op(std::vector<expr::TOKEN>& tokens, const s
 			!validate_set_op(tokens[i]._child, expr, false)) {
 
 				result = false;
-				logger::vverbose << logger::tag("validator") << "SET expression failure in expression inside parentheses" << std::endl;
+				logger::vverbose["validator"] << "SET expression failure in expression inside parentheses" << std::endl;
 				break;
 
 		} else if ( tokens[i] == expr::T_FUNCTION ) {
@@ -570,7 +570,7 @@ bool expr::expression::validate_set_op(std::vector<expr::TOKEN>& tokens, const s
 
 				if ( tokens[i]._args[arg_i] == expr::OP_SET ) {
 
-					logger::error << logger::tag("validator") << "SET operator in wrong place, SET is not allowed " <<
+					logger::error["validator"] << "SET operator in wrong place, SET is not allowed " <<
 						"in functions arguments, ignoring SET <" << expr << ">" << std::endl;
 
 					result = false;
@@ -591,7 +591,7 @@ bool expr::expression::validate_set_op(std::vector<expr::TOKEN>& tokens, const s
 
 				if ( arg_i == 0 && tokens[i]._args[arg_i] == expr::OP_COM ) {
 
-					logger::verbose << logger::tag("sanitizer") << "Double COM(,) operator after validating SET " <<
+					logger::verbose["sanitizer"] << "Double COM(,) operator after validating SET " <<
 						"operators from function args, ignoring COM operator <" << expr << ">" << std::endl;
 					tokens[i]._args.erase(arg_i == 0 ? tokens[i]._args.begin() : ( tokens[i]._args.begin() + arg_i ));
 					result = false;
@@ -601,7 +601,7 @@ bool expr::expression::validate_set_op(std::vector<expr::TOKEN>& tokens, const s
 				} else if ( arg_i < ( tokens[i]._args.size() - 1 ) &&
 					tokens[i]._args[arg_i] == expr::OP_COM && tokens[i]._args[arg_i + 1] == expr::OP_COM ) {
 
-					logger::verbose << logger::tag("sanitizer") << "Double COM(,) operator after validating SET " <<
+					logger::verbose["sanitizer"] << "Double COM(,) operator after validating SET " <<
 						"operators from function args, ignoring COM operator <" << expr << ">" << std::endl;
 					tokens[i]._args.erase(arg_i == 0 ? tokens[i]._args.begin() : ( tokens[i]._args.begin() + arg_i ));
 					result = false;
@@ -609,7 +609,7 @@ bool expr::expression::validate_set_op(std::vector<expr::TOKEN>& tokens, const s
 					break;
 				} else if ( arg_i < (tokens[i]._args.size() - 1 ) &&
 					tokens[i]._args[arg_i] == expr::T_OPERATOR && tokens[i]._args[arg_i + 1] == expr::OP_COM ) {
-					logger::verbose << logger::tag("sanitizer") << "function argument's last argument is operator " <<
+					logger::verbose["sanitizer"] << "function argument's last argument is operator " <<
 						describe(tokens[i]._args[arg_i]._op) << " which cannot work, ignoring it <" << expr << ">" << std::endl;
 					tokens[i]._args.erase(arg_i == 0 ? tokens[i]._args.begin() : ( tokens[i]._args.begin() + arg_i ));
 					result = false;
@@ -634,8 +634,8 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& s) {
 	std::vector<expr::TOKEN> tokens = parse_expr(s, false);
 
 	if ( !tokens.empty() && !validate_set_op(tokens, describe(tokens), true)) {
-		logger::warning << logger::tag("sanitizer") << "failures in expression with SET argument <" << s << ">" << std::endl;
-		logger::vverbose << logger::tag("sanitizer") << "expression might be broken, expression after sanitizing: <" << describe(tokens) << ">" << std::endl;
+		logger::warning["sanitizer"] << "failures in expression with SET argument <" << s << ">" << std::endl;
+		logger::vverbose["sanitizer"] << "expression might be broken, expression after sanitizing: <" << describe(tokens) << ">" << std::endl;
 	}
 
 	return tokens;

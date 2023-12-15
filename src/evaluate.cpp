@@ -83,11 +83,9 @@ std::vector<expr::TOKEN> expr::expression::eval_functions(
 					try {
 						args[a] = eval(args[a], false, functions, variables);
 					} catch ( std::runtime_error& e ) {
-						logger::error << logger::tag("evaluate") <<
-							"evaluation error for <" <<
+						logger::error["evaluate"] << "evaluation error for <" <<
 							describe(args[a]) << ">: " << e.what() << std::endl;
-						logger::warning << logger::tag("evaluate") <<
-							"replacing with null" << std::endl;
+						logger::warning["evaluate"] << "replacing with null" << std::endl;
 						args[a].clear();
 						args[a].push_back(expr::TOKEN::UNDEF());
 						abort = false; // note: this is intentional, we just replaced it
@@ -101,8 +99,7 @@ std::vector<expr::TOKEN> expr::expression::eval_functions(
 					try {
 						args[a] = eval(args[a], false, functions, variables);
 					} catch ( std::runtime_error& e ) {
-						logger::error << logger::tag("evaluate") <<
-							"evaluation error with variable <" <<
+						logger::error["evaluate"] << "evaluation error with variable <" <<
 							describe(args[a]) << ">: " << e.what() << std::endl;
 						abort = true;
 					}
@@ -115,8 +112,7 @@ std::vector<expr::TOKEN> expr::expression::eval_functions(
 					try {
 						args[a] = eval(args[a], false, functions, variables);
 					} catch ( std::runtime_error& e ) {
-						logger::error << logger::tag("evaluate") <<
-							"evaluation error with function <" <<
+						logger::error["evaluate"] << "evaluation error with function <" <<
 							describe(args[a]) << ">: " << e.what() << std::endl;
 						abort = true;
 					}
@@ -144,10 +140,8 @@ std::vector<expr::TOKEN> expr::expression::eval_functions(
 				} else f_args.push_back(nullptr);
 
 				if ( abort )
-					logger::warning << logger::tag("evaluate") <<
-						"evaluation problem, abort caused by error in expression" <<
-						std::endl;
-
+					logger::warning["evaluate"] << "evaluation problem, " <<
+						"abort caused by error in expression" << std::endl;
 			}
 
 			VARIABLE arg = nullptr;
@@ -167,7 +161,7 @@ std::vector<expr::TOKEN> expr::expression::eval_functions(
 
 		} else {
 
-			logger::warning << logger::tag("evaluator") << "ignored unknown function " <<
+			logger::warning["evaluate"] << "ignored unknown function " <<
 				common::to_lower(std::as_const(tokens[i]._name)) << std::endl;
 			tokens[i] = tok;
 			return tokens;
@@ -205,11 +199,10 @@ std::vector<expr::TOKEN> expr::expression::eval_parentheses(std::vector<expr::TO
 			try {
 				tokens[i]._child = eval(tokens[i]._child, false, functions, variables);
 			} catch ( std::runtime_error& e ) {
-				logger::error << logger::tag("evaluate") <<
+				logger::error["evaluate"] <<
 					"evaluation error inside parentheses <" <<
 					describe(tokens[i]._child) << ">: " << e.what() << std::endl;
-				logger::warning << logger::tag("evaluate") <<
-					"replacing parentheses with null" << std::endl;
+				logger::warning["evaluate"] << "replacing parentheses with null" << std::endl;
 
 				tokens[i]._child.clear();
 				tokens[i]._child.push_back(expr::TOKEN::UNDEF());
@@ -220,12 +213,12 @@ std::vector<expr::TOKEN> expr::expression::eval_parentheses(std::vector<expr::TO
 
 		if ( tokens[i] == expr::T_SUB && tokens[i]._child.size() == 1 ) {
 			if ( tokens[i]._child[0] == expr::T_UNDEF ) {
-				logger::error << logger::tag("evaluate") << "error while evaluating parentheses, result was null" << std::endl;
+				logger::error["evaluate"] << "error while evaluating parentheses, result was null" << std::endl;
 				tokens.erase(i == 0 ? tokens.begin() : ( tokens.begin() + i ));
 			} else tokens[i] = tokens[i]._child[0];
 			return tokens;
 		} else if ( tokens[i] == expr::T_SUB && tokens[i]._child.size() == 0 ) {
-			logger::error << logger::tag("evaluate") << "cannot evaluate value inside parentheses, it is considered as null" << std::endl;
+			logger::error["evaluate"] << "cannot evaluate value inside parentheses, it is considered as null" << std::endl;
 			tokens.erase(i == 0 ? tokens.begin() : ( tokens.begin() + i ));
 			return tokens;
 		}
@@ -251,11 +244,10 @@ std::vector<expr::TOKEN> expr::expression::eval_conditionals(
 				tokens[i]._cond1 = eval(tokens[i]._cond1, false, functions, variables);
 			} catch ( std::runtime_error& e ) {
 
-				logger::error << logger::tag("evaluate") <<
+				logger::error["evaluate"] <<
 					"evaluation error inside condition's true result <" <<
 					describe(tokens[i]._cond1) << ">: " << e.what() << std::endl;
-				logger::warning << logger::tag("evaluate") <<
-					"replacing true condition with null" << std::endl;
+				logger::warning["evaluate"] << "replacing true condition with null" << std::endl;
 
 				tokens[i]._cond1.clear();
 				tokens[i]._cond1.push_back(expr::TOKEN::UNDEF());
@@ -265,9 +257,9 @@ std::vector<expr::TOKEN> expr::expression::eval_conditionals(
 		}
 
 		if ( tokens[i]._cond1.size() == 1 && tokens[i]._cond1[0] == expr::T_UNDEF )
-			logger::verbose << logger::tag("evaluate") << "warning, while pre-processing conditional, true result is undefined result" << std::endl;
+			logger::verbose["evaluate"] << "warning, while pre-processing conditional, true result is undefined result" << std::endl;
 		else if ( tokens[i]._cond1.size() == 0 ) {
-			logger::error << logger::tag("evaluate") << "conditional true result evaluated to null" << std::endl;
+			logger::error["evaluate"] << "conditional true result evaluated to null" << std::endl;
 			tokens[i]._cond1.push_back(TOKEN::UNDEF());
 		}
 
@@ -278,11 +270,10 @@ std::vector<expr::TOKEN> expr::expression::eval_conditionals(
 			try {
 				tokens[i]._cond2 = eval(tokens[i]._cond2, false, functions, variables);
 			} catch ( std::runtime_error& e ) {
-				logger::error << logger::tag("evaluate") <<
+				logger::error["evaluate"] <<
 					"evaluation error inside condition's false result <" <<
 					describe(tokens[i]._cond2) << ">: " << e.what() << std::endl;
-				logger::warning << logger::tag("evaluate") <<
-					"replacing false condition with null" << std::endl;
+				logger::warning["evaluate"] << "replacing false condition with null" << std::endl;
 
 				tokens[i]._cond2.clear();
 				tokens[i]._cond2.push_back(expr::TOKEN::UNDEF());
@@ -291,9 +282,9 @@ std::vector<expr::TOKEN> expr::expression::eval_conditionals(
 		}
 
 		if ( tokens[i]._cond2.size() == 1 && tokens[i]._cond2[0] == expr::T_UNDEF )
-			logger::verbose << logger::tag("evaluate") << "warning, while pre-processing conditional, false result is undefined result" << std::endl;
+			logger::verbose["evaluate"] << "warning, while pre-processing conditional, false result is undefined result" << std::endl;
 		else if ( tokens[i]._cond2.size() == 0 ) {
-			logger::error << logger::tag("evaluate") << "conditional false result evaluated to null" << std::endl;
+			logger::error["evaluate"] << "conditional false result evaluated to null" << std::endl;
 			tokens[i]._cond1.push_back(expr::TOKEN::UNDEF());
 		}
 
@@ -354,9 +345,9 @@ std::vector<expr::TOKEN> expr::expression::eval(
 
 		if ( tokens[0] == expr::OP_SUB || tokens[0] == expr::OP_NOT || tokens[0] == expr::OP_NNOT ) { // O_SGN
 			if ( tokens.size() < 2 ) {
-				logger::warning << logger::tag("evaluate") <<
-					"single operator(" << describe(tokens[0]._op) <<
-					") without left and right side value always returns 0" << std::endl;
+				logger::warning["evaluate"] <<
+					"single operator(" << describe(tokens[0]._op) << ") without " <<
+					"left and right side value always returns 0" << std::endl;
 				tokens[0] = expr::TOKEN::NUMBER(0);
 				return tokens;
 			}
@@ -370,7 +361,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 		if ( !( tokens.size() > 1 && tokens[1] == expr::OP_SUB &&
 			( tokens[0] == expr::OP_NOT || tokens[0] == expr::OP_NNOT ))) {
 
-			logger::error << logger::tag("evaluate") << "left side value missing from expression" << std::endl;
+			logger::error["evaluate"] << "left side value missing from expression" << std::endl;
 			tokens.erase(tokens.begin());
 			return tokens;
 		}
@@ -380,7 +371,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 
 	if ( tokens[0] == expr::T_CONDITIONAL ) {
 
-		logger::error << logger::tag("evaluate") << "conditional expression without condition, ignoring" << std::endl;
+		logger::error["evaluate"] << "conditional expression without condition, ignoring" << std::endl;
 		tokens.erase(tokens.begin());
 		return tokens;
 	}
@@ -412,7 +403,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 						tokens[2] = expr::TOKEN::ADD(tokens[0].to_double(), tokens[2].to_double());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator ADD(+) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator ADD(+) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -436,7 +427,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 					tokens[2] = expr::TOKEN::SUB(tokens[0].to_double(), tokens[2].to_double());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator SUB(-) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator SUB(-) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -448,7 +439,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 					tokens[2] = expr::TOKEN::CAT(tokens[0].to_string(), tokens[2].to_string());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator CAT(.) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator CAT(.) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -460,7 +451,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 					tokens[2] = expr::TOKEN::MUL(tokens[0].to_double(), tokens[2].to_double());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator MUL(*) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator MUL(*) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -472,7 +463,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 					tokens[2] = expr::TOKEN::DIV(tokens[0].to_double(), tokens[2].to_double());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator DIV(/) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator DIV(/) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -484,7 +475,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 					tokens[2] = expr::TOKEN::MOD(tokens[0].to_double(), tokens[2].to_double());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator MOD(%) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator MOD(%) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -496,7 +487,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 					tokens[2] = expr::TOKEN::POW(tokens[0].to_double(), tokens[2].to_double());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator POW(^)with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator POW(^)with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -509,7 +500,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 					tokens[2] = expr::TOKEN::OR(tokens[0].to_double(), tokens[2].to_double());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator OR(|) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator OR(|) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -521,7 +512,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 					tokens[2] = expr::TOKEN::AND(tokens[0].to_double(), tokens[2].to_double());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator AND(&) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator AND(&) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -543,7 +534,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 						tokens[2] = expr::TOKEN::NEQ(tokens[0].to_double(), tokens[2].to_double());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator NEQ(==) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator NEQ(==) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -558,7 +549,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 						tokens[2] = expr::TOKEN::NNE(tokens[0].to_double(), tokens[2].to_double());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator NNE(!=) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator NNE(!=) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -573,7 +564,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 						tokens[2] = expr::TOKEN::NLT(tokens[0].to_double(), tokens[2].to_double());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator NLT(<) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator NLT(<) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -588,7 +579,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 						tokens[2] = expr::TOKEN::NLE(tokens[0].to_double(), tokens[2].to_double());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator NLE(<=) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator NLE(<=) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -603,7 +594,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 						tokens[2] = TOKEN::NGT(tokens[0].to_double(), tokens[2].to_double());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator NGT(>) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator NGT(>) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -618,7 +609,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 						tokens[2] = TOKEN::NGE(tokens[0].to_double(), tokens[2].to_double());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator NGE(>=) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator NGE(>=) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -634,7 +625,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 						tokens[2] = expr::TOKEN::SEQ(tokens[0].to_string(), tokens[2].to_string());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator SEQ(eq) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator SEQ(eq) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -649,7 +640,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 						tokens[2] = expr::TOKEN::SNE(tokens[0].to_string(), tokens[2].to_string());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator SNE(ne) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator SNE(ne) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -664,7 +655,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 						tokens[2] = expr::TOKEN::SLT(tokens[0].to_string(), tokens[2].to_string());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator SLT(lt) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator SLT(lt) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -679,7 +670,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 						tokens[2] = expr::TOKEN::SLE(tokens[0].to_string(), tokens[2].to_string());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator SLE(le) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator SLE(le) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -694,7 +685,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 						tokens[2] = expr::TOKEN::SGT(tokens[0].to_string(), tokens[2].to_string());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator SGT(gt) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator SGT(gt) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
@@ -709,14 +700,14 @@ std::vector<expr::TOKEN> expr::expression::eval(
 						tokens[2] = expr::TOKEN::SGE(tokens[0].to_string(), tokens[2].to_string());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
-					logger::error << logger::tag("evaluate") << "operator SGE(>=) with missing right side value" << std::endl;
+					logger::error["evaluate"] << "operator SGE(>=) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;
 
 
 			default:
-				logger::error << logger::tag("evaluate") << "unhandled unknown operator " << describe(tokens[1]._op) << std::endl;
+				logger::error["evaluate"] << "unhandled unknown operator " << describe(tokens[1]._op) << std::endl;
 				tokens.erase(tokens.begin());
 		}
 
@@ -744,7 +735,7 @@ expr::TOKEN expr::expression::evaluate(std::vector<expr::TOKEN>& tokens, expr::F
 		try {
 			tokens = eval(tokens, false, functions, variables);
 		} catch ( std::runtime_error& e ) {
-			logger::error << logger::tag("evaluate") << e.what() << std::endl;
+			logger::error["evaluate"] << e.what() << std::endl;
 			abort = true;
 		}
 	}
@@ -753,7 +744,7 @@ expr::TOKEN expr::expression::evaluate(std::vector<expr::TOKEN>& tokens, expr::F
 		try {
 			tokens = eval(tokens, false, functions, variables);
 		} catch ( std::runtime_error& e ) {
-			logger::error << logger::tag("evaluate") << e.what() << std::endl;
+			logger::error["evaluate"] << e.what() << std::endl;
 			abort = true;
 		}
 		if ( !abort ) goto begin_evaluate;
@@ -763,7 +754,7 @@ expr::TOKEN expr::expression::evaluate(std::vector<expr::TOKEN>& tokens, expr::F
 		try {
 			tokens = eval(tokens, false, functions, variables);
 		} catch ( std::runtime_error& e ) {
-			logger::error << logger::tag("evaluate") << e.what() << std::endl;
+			logger::error["evaluate"] << e.what() << std::endl;
 			abort = true;
 		}
 		if ( !abort ) goto begin_evaluate;
@@ -779,7 +770,7 @@ expr::TOKEN expr::expression::evaluate(std::vector<expr::TOKEN>& tokens, expr::F
 		try {
 			tokens = eval(tokens, false, functions, variables);
 		} catch ( std::runtime_error&e ) {
-			logger::error << logger::tag("evaluate") << e.what() << std::endl;
+			logger::error["evaluate"] << e.what() << std::endl;
 			abort = true;
 		}
 	}
@@ -793,7 +784,7 @@ expr::TOKEN expr::expression::evaluate(std::vector<expr::TOKEN>& tokens, expr::F
 			else if ( tokens.front().is_string())
 				(*variables)[set_variable] = tokens.front().to_string();
 			else {
-				logger::verbose << logger::tag("evaluate") << "ambiguos result of expr, variable " << set_variable <<
+				logger::verbose["evaluate"] << "ambiguos result of expr, variable " << set_variable <<
 					" was set to null" << std::endl;
 				(*variables)[set_variable] = nullptr;
 			}
@@ -803,9 +794,9 @@ expr::TOKEN expr::expression::evaluate(std::vector<expr::TOKEN>& tokens, expr::F
 	}
 
 	if ( abort )
-		logger::warning << logger::tag("evaluate") << "evaluation was aborted because of errors";
+		logger::warning["evaluate"] << "evaluation was aborted because of errors";
 	else
-		logger::warning << logger::tag("evaluate") << "evaluating ended up with ambiguous results, result will be null";
+		logger::warning["evaluate"] << "evaluating ended up with ambiguous results, result will be null";
 
 	if ( !set_variable.empty() && variables != nullptr ) {
 		logger::warning << " and variable " << set_variable << " was set to nullptr";

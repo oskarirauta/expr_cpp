@@ -35,7 +35,7 @@ const double expr::VARIABLE::raw_double() const {
 	try {
 		return std::get<double>(*this);
 	} catch ( std::bad_variant_access const& e ) {
-		logger::error << logger::tag("convert") << "raw get number failed: " << e.what() << std::endl;
+		logger::error["convert"] << "raw get number failed: " << e.what() << std::endl;
 	}
 
 	return 0;
@@ -50,7 +50,7 @@ const std::string expr::VARIABLE::raw_string() const {
 	try {
 		return std::get<std::string>(*this);
 	} catch ( std::bad_variant_access const& e ) {
-		logger::error << logger::tag("convert") << "raw get string failed: " << e.what() << std::endl;
+		logger::error["convert"] << "raw get string failed: " << e.what() << std::endl;
 	}
 	return "";
 }
@@ -70,7 +70,7 @@ expr::VARIABLE::operator double() const {
 					try {
 						n = std::stod(s);
 					} catch ( std::invalid_argument& e ) {
-						logger::error << logger::tag("convert") <<
+						logger::error["convert"] <<
 							"failed to convert string '" << s <<
 							"' to number value, using value 0" << std::endl;
 						n = (double)0;
@@ -78,12 +78,10 @@ expr::VARIABLE::operator double() const {
 				}
 				break;
 		case expr::V_NULLPTR:
-				logger::vverbose << logger::tag("convert") <<
-					"converted nullptr to value 0" << std::endl;
+				logger::vverbose["convert"] << "converted nullptr to value 0" << std::endl;
 				break;
 		default:
-				logger::warning << logger::tag("convert") <<
-					"casting from unknown type to number failed, using value 0" << std::endl;
+				logger::warning["convert"] << "casting from unknown type to number failed, using value 0" << std::endl;
 	}
 	return n;
 }
@@ -104,13 +102,11 @@ expr::VARIABLE::operator std::string() const {
 				s = this -> raw_string();
 				break;
 		case expr::V_NULLPTR:
-				logger::vverbose << logger::tag("convert") <<
-					"converted nullptr to value ''" << std::endl;
+				logger::vverbose["convert"] << "converted nullptr to value ''" << std::endl;
 				s = "";
 				break;
 		default:
-				logger::warning << logger::tag("convert") <<
-					"casting from unknown type to string failed, using value ''" << std::endl;
+				logger::warning["convert"] << "casting from unknown type to string failed, using value ''" << std::endl;
 				s = "";
 	}
 

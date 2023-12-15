@@ -20,40 +20,40 @@ static bool math_error_handler(const std::string& name, const double n1, const d
 	if ( math_errhandling & MATH_ERRNO && ( errno == EDOM || errno == ERANGE )) {
 
 		ret = true;
-		logger::warning << logger::tag("evaluate") << "math " << ( errno == EDOM ? "domain" : "range" ) <<
-					" error on " << name << "( " << n1 << " " << sign << " " << n2 << " )" << std::endl;
+		logger::warning["evaluate"] << "math " << ( errno == EDOM ? "domain" : "range" ) <<
+			" error on " << name << "( " << n1 << " " << sign << " " << n2 << " )" << std::endl;
 	}
 
 	if ( math_errhandling & MATH_ERREXCEPT ) {
 
 		if ( fetestexcept(FE_INEXACT)) {
 			// do not set ret = true here, we are good with rounded result
-			logger::warning << logger::tag("evaluate") << "inexact result" <<
+			logger::warning["evaluate"] << "inexact result" <<
 				" error on " << name << "( " << n1 << " " << sign << " " << n2 << " )" <<
 				" , result was rounded to fit in the data type" << std::endl;
 		}
 
 		if ( fetestexcept(FE_INVALID)) {
 			ret = true;
-			logger::warning << logger::tag("evaluate") << "math domain" <<
+			logger::warning["evaluate"] << "math domain" <<
 				" error on " << name << "( " << n1 << " " << sign << " " << n2 << " )" << std::endl;
 		}
 
 		if ( fetestexcept(FE_DIVBYZERO)) {
 			ret = true;
-			logger::warning << logger::tag("evaluate") << "math division" <<
+			logger::warning["evaluate"] << "math division" <<
 				" by zero error raised by " << name << "( " << n1 << " " << sign << " " << n2 << " )" << std::endl;
 		}
 
 		if ( fetestexcept(FE_OVERFLOW)) {
 			ret = true;
-			logger::warning << logger::tag("evaluate") << "range overflow error" <<
+			logger::warning["evaluate"] << "range overflow error" <<
 				" was raised by " << name << "( " << n1 << " " << sign << " " << n2 << " )" << std::endl;
 		}
 
 		if ( fetestexcept(FE_UNDERFLOW)) {
 			ret = true;
-			logger::warning << logger::tag("evaluate") << "range undeflow error" <<
+			logger::warning["evaluate"] << "range undeflow error" <<
 				" was raised by " << name << "( " << n1 << " " << sign << " " << n2 << " )" << std::endl;
 		}
 	}
@@ -144,7 +144,7 @@ expr::TOKEN expr::TOKEN::DIV(const double n1, const double n2) {
 	expr::TOKEN token;
 	token._type = expr::T_NUMBER;
 	if ( n2 == 0 ) {
-		logger::warning << logger::tag("evaluate") << "division by zero (" << n1 << " / 0 )" << std::endl;
+		logger::warning["evaluate"] << "division by zero (" << n1 << " / 0 )" << std::endl;
 		token._value = (double)0;
 	} else if ( n1 == 0 ) {
 		token._value = (double)0;
@@ -161,7 +161,7 @@ expr::TOKEN expr::TOKEN::MOD(const double n1, const double n2) {
 	expr::TOKEN token;
 	token._type = expr::T_NUMBER;
 	if ( n2 == 0 ) {
-		logger::warning << logger::tag("evaluate") << "modulo by zero (" << n1 << " % 0 )" << std::endl;
+		logger::warning["evaluate"] << "modulo by zero (" << n1 << " % 0 )" << std::endl;
 		token._value = (double)0;
 	} else {
 		reset_math_errors();

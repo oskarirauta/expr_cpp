@@ -24,11 +24,9 @@ expr::RESULT& expr::RESULT::operator=(const expr::TOKEN& t) {
 	else if ( t == expr::T_STRING ) this -> emplace<std::string>(std::forward<decltype(t.to_string())>(t.to_string()));
 	else if ( t == expr::T_UNDEF ) this -> emplace<std::nullptr_t>(std::forward<decltype(nullptr)>(nullptr));
 	else {
-		logger::verbose << logger::tag("evaluate") <<
-			"cannot get result from " <<
+		logger::verbose["evaluate"] << "cannot get result from " <<
 			typedesc(t) << " token" << std::endl;
-		logger::vverbose << logger::tag("evaluate") <<
-			"using null result instead" << std::endl;
+		logger::vverbose["evaluate"] << "using null result instead" << std::endl;
 
 		this -> emplace<std::nullptr_t>(std::forward<decltype(nullptr)>(nullptr));
 	}
@@ -54,11 +52,9 @@ expr::RESULT::RESULT(const expr::TOKEN& t) {
 	else if ( t == expr::T_STRING ) this -> emplace<std::string>(std::forward<decltype(t.to_string())>(t.to_string()));
 	else if ( t == expr::T_UNDEF ) this -> emplace<std::nullptr_t>(std::forward<decltype(nullptr)>(nullptr));
 	else {
-		logger::verbose << logger::tag("evaluate") <<
-			"cannot get result from " <<
+		logger::verbose["evaluate"] << "cannot get result from " <<
 			typedesc(t) << " token" << std::endl;
-		logger::vverbose << logger::tag("evaluate") <<
-			"using null result instead" << std::endl;
+		logger::vverbose["evaluate"] << "using null result instead" << std::endl;
 
 		this -> emplace<std::nullptr_t>(std::forward<decltype(nullptr)>(nullptr));
 	}

@@ -19,6 +19,4 @@ namespace expr {
 
 } // end of namespace expr
 
-const std::string describe(const expr::RESULT& r) {
-	return r.describe();
-}
+const std::string describe(const expr::RESULT& r);

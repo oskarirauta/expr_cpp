@@ -65,7 +65,7 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 			while ( common::is_alnum(s))
 				word += common::erase_front(s);
 
-			if ( s.size() >= 3 && s.starts_with("::") && std::isdigit(s.at(2))) {
+			if ( s.size() >= 3 && s.starts_with("::") && common::is_alnum(s.at(2))) {
 
 				word += common::erase_prefix(s, 3);
 				while ( common::is_alnum(s))

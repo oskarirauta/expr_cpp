@@ -49,6 +49,8 @@ expr::TOKEN expr::expression::tokenize_variable_value(const std::string& name, e
 		tok = (double)0;
 	}
 
+	if ( tok == T_UNDEF ) tok = TOKEN::STRING("");
+
 	return tok;
 }
 
@@ -716,6 +718,37 @@ std::vector<expr::TOKEN> expr::expression::eval(
 		}
 
 		return tokens;
+
+	} else if ( tokens.size() > 1 && tokens[0] == T_NUMBER && tokens[1] == T_STRING ) {
+
+		if ( !tokens[1].to_string().empty())
+			tokens[0] = expr::TOKEN::STRING(tokens[0].to_string() + tokens[1].to_string());
+		tokens.erase(tokens.begin() + 1);
+
+	} else if ( tokens.size() > 1 && tokens[0] == T_STRING && tokens[1] == T_NUMBER ) {
+
+		if ( !tokens[0].to_string().empty())
+			tokens[1] = expr::TOKEN::STRING(tokens[0].to_string() + tokens[1].to_string());
+		tokens.erase(tokens.begin());
+
+	} else if ( tokens.size() > 1 && tokens[0] == T_NUMBER && tokens[1] == T_NUMBER ) {
+
+		tokens[0] = expr::TOKEN::NUMBER(tokens[0].to_double() + tokens[1].to_double());
+		tokens.erase(tokens.begin() + 1);
+
+	} else if ( tokens.size() > 1 && tokens[0] == T_STRING && tokens[1] == T_STRING ) {
+
+		tokens[0] = expr::TOKEN::STRING(tokens[0].to_string() + tokens[1].to_string());
+		tokens.erase(tokens.begin() + 1);
+
+	} else if ( tokens.size() > 1 && tokens[0] == T_UNDEF ) {
+
+		tokens.erase(tokens.begin());
+
+	} else if ( tokens.size() > 1 && tokens[1] == T_UNDEF ) {
+
+		tokens.erase(tokens.begin() + 1);
+
 	}
 
 	return tokens;

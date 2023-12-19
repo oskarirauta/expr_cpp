@@ -65,7 +65,7 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 			while ( common::is_alnum(s))
 				word += common::erase_front(s);
 
-			if ( s.size() >= 3 && s.starts_with("::") && common::is_alpha(s.at(2))) {
+			if ( s.size() >= 3 && s.starts_with("::") && std::isdigit(s.at(2))) {
 
 				word += common::erase_prefix(s, 3);
 				while ( common::is_alnum(s))
@@ -99,12 +99,23 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 					word += common::erase_front(s);
 			}
 
-			token = expr::T_NUMBER;
-			try {
-				token = std::stod(word);
-			} catch ( std::invalid_argument& e ) {
-				logger::error["parser"] << "cannot convert '" << word << "' to number" << std::endl;
-				token = (double)0;
+			if ( common::is_alpha(s)) {
+
+				while ( common::is_alnum(s))
+					word += common::erase_front(s);
+
+				token = expr::T_VARIABLE;
+				token._name = word;
+
+			} else {
+
+				token = expr::T_NUMBER;
+				try {
+					token = std::stod(word);
+				} catch ( std::invalid_argument& e ) {
+					logger::error["parser"] << "cannot convert '" << word << "' to number" << std::endl;
+					token = (double)0;
+				}
 			}
 
 		} else if ( s.front() == '\'' || s.front() == '"' ) { /* string */

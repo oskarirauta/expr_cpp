@@ -10,23 +10,23 @@ EXPR_OBJS:= \
 	objs/expr_parser.o \
 	objs/expr_evaluate.o
 
-objs/expr_variable.o: src/variable.cpp
+objs/expr_variable.o: $(EXPRCPP_DIR)/src/variable.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -o $@ $<;
 
-objs/expr_result.o: src/result.cpp
+objs/expr_result.o: $(EXPRCPP_DIR)/src/result.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -o $@ $<;
 
-objs/expr_token.o: src/token.cpp
+objs/expr_token.o: $(EXPRCPP_DIR)/src/token.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -o $@ $<;
 
-objs/expr_token_ops.o: src/token_ops.cpp
+objs/expr_token_ops.o: $(EXPRCPP_DIR)/src/token_ops.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -o $@ $<;
 
-objs/expr_expression.o: src/expression.cpp
+objs/expr_expression.o: $(EXPRCPP_DIR)/src/expression.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -o $@ $<;
 
-objs/expr_parser.o: src/parser.cpp
+objs/expr_parser.o: $(EXPRCPP_DIR)/src/parser.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -o $@ $<;
 
-objs/expr_evaluate.o: src/evaluate.cpp
+objs/expr_evaluate.o: $(EXPRCPP_DIR)/src/evaluate.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -o $@ $<;

@@ -43,6 +43,10 @@ expr::TOKEN expr::expression::tokenize_variable_value(const std::string& name, e
 			tok = std::get<std::string>(v);
 		else if ( std::holds_alternative<double>(v))
 			tok = std::get<double>(v);
+	} else if ( !name.empty() && common::to_lower(std::as_const(name)) == "true" ) {
+		tok = (double)1;
+	} else if ( !name.empty() && common::to_lower(std::as_const(name)) == "false" ) {
+		tok = (double)0;
 	}
 
 	return tok;

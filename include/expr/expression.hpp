@@ -25,6 +25,9 @@ namespace expr {
 		const std::vector<TOKEN>& tokens();
 		const std::vector<TOKEN> tokens() const;
 
+		operator std::string() const;
+		const std::string to_string() const;
+
 		expression(const std::string& s);
 		~expression();
 

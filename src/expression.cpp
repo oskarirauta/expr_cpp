@@ -13,6 +13,14 @@ const std::vector<expr::TOKEN> expr::expression::tokens() const {
 	return this -> _tokens;
 }
 
+expr::expression::operator std::string() const {
+	return !this -> _tokens.empty() ? describe(this -> _tokens) : "";
+}
+
+const std::string expr::expression::to_string() const {
+	return operator std::string();
+}
+
 void expr::expression::parse(const std::string& s) {
 	// todo: try
 	this -> _raw = s;

@@ -7,6 +7,7 @@
 #include "lowercase_map.hpp"
 #include "expr/variable.hpp"
 #include "expr/function.hpp"
+#include "expr/property.hpp"
 #include "expr/result.hpp"
 #include "expr/token.hpp"
 
@@ -28,6 +29,7 @@ namespace expr {
 		operator std::string() const;
 		const std::string to_string() const;
 
+		expression();
 		expression(const std::string& s);
 		~expression();
 

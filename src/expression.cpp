@@ -24,7 +24,14 @@ const std::string expr::expression::to_string() const {
 void expr::expression::parse(const std::string& s) {
 	// todo: try
 	this -> _raw = s;
+	if ( this -> _tokens.empty())
+		this -> _tokens.push_back(expr::TOKEN::UNDEF());
 	this -> _tokens = parse_expr(s);
+}
+
+expr::expression::expression() {
+	this -> _raw = "";
+	this -> parse(this -> _raw);
 }
 
 expr::expression::expression(const std::string& s) {
@@ -38,7 +45,12 @@ expr::expression::~expression() {
 }
 
 const std::string describe(const expr::expression& e) {
-	return describe(e.tokens());;
+
+	auto t = e.tokens();
+
+	if ( t.empty() || ( t.size() == 1 && t[0] == expr::T_UNDEF ))
+		return "nullptr";
+	return describe(t);
 }
 
 std::ostream& expr::operator <<(std::ostream& os, expr::expression const& e) {

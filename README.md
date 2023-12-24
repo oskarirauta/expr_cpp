@@ -27,11 +27,14 @@ merged with other projects. On it's own, this is mostly
 useful for demonstration purposes.
 
 #depencies
+
 common: [https://github.com/oskarirauta/common_cpp.git](https://github.com/oskarirauta/common_cpp)
 logger: [https://github.com/oskarirauta/logcpp.git](https://github.com/oskarirauta/logcpp)
 
-### status
-development on-going; but works pretty nicely and is usable.
+### development status
+
+on-going; but works pretty nicely and is usable.
 
 ### license
+
 MIT

@@ -20,6 +20,8 @@ namespace expr {
 		const int raw_int() const;
 		const std::string raw_string() const;
 
+		const VARIABLE lowercase() const;
+
 		operator double() const;
 		operator int() const;
 		operator std::string() const;
@@ -46,6 +48,7 @@ namespace expr {
 		VARIABLE(const int i);
 		VARIABLE(const double d);
 		VARIABLE(const std::string& s);
+		VARIABLE(const VARIABLE& other);
 
 		const std::string describe() const;
 		friend std::ostream& operator <<(std::ostream& os, VARIABLE const& v) {

@@ -19,6 +19,17 @@ expr::VARIABLE::VARIABLE(const std::string& s) {
 	this -> emplace<std::string>(std::forward<decltype(s)>(s));
 }
 
+expr::VARIABLE::VARIABLE(const expr::VARIABLE& other) {
+
+	if ( other.is_string()) {
+		std::string s = other.operator std::string();
+		this -> emplace<std::string>(std::forward<decltype(s)>(s));
+	} else if ( other.is_number()) {
+		double d = other.operator double();
+		this -> emplace<double>(std::forward<decltype(d)>(d));
+	} else this -> emplace<std::nullptr_t>(std::forward<decltype(nullptr)>(nullptr));
+}
+
 const expr::VAR_TYPE expr::VARIABLE::type() const {
 
 	if ( std::holds_alternative<double>(*this)) return expr::V_NUMBER;
@@ -53,6 +64,15 @@ const std::string expr::VARIABLE::raw_string() const {
 		logger::error["convert"] << "raw get string failed: " << e.what() << std::endl;
 	}
 	return "";
+}
+
+const expr::VARIABLE expr::VARIABLE::lowercase() const {
+
+	if ( !this -> is_string())
+		return *this;
+
+	std::string s = operator std::string();
+	return expr::VARIABLE(common::to_lower(s));
 }
 
 expr::VARIABLE::operator double() const {

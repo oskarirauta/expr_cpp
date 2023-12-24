@@ -69,9 +69,10 @@ int main(int argc, char **argv) {
 	//std::string s = "!!!!!!!!-10";
 
 	//std::string s = "1 ++ 1";
+	//std::string s = "'HELLO WORLD'";
 	//std::string s = "myvar = 'hello'";
 
-	std::string s = "         myvar     = 'hello'";
+	//std::string s = "         myvar     = 'hello'";
 	//std::string s = "s";
 
 	expr::expression e(s);
@@ -99,6 +100,6 @@ int main(int argc, char **argv) {
 		std::cout << "runtime error, " << e.what() << std::endl;
 	}
 
-	std::cout << "result: " << result << " description: " << describe(result) << std::endl;
+	std::cout << "result: " << result/*.lowercase()*/ << " description: " << describe(result) << std::endl;
 	return 0;
 }

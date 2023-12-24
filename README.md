@@ -22,7 +22,7 @@ This will be written as a git submodule that can be easily
 included with other projects. On it's own, this is useful
 mostly for demonstration purposes.
 
-###depencies
+### depencies
  - common: [https://github.com/oskarirauta/common_cpp.git](https://github.com/oskarirauta/common_cpp)
  - logger: [https://github.com/oskarirauta/logcpp.git](https://github.com/oskarirauta/logcpp)
 

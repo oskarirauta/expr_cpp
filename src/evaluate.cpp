@@ -759,6 +759,9 @@ expr::TOKEN expr::expression::evaluate(std::vector<expr::TOKEN>& tokens, expr::F
 	bool abort = false;
 	std::string set_variable;
 
+	if ( tokens.empty())
+		return expr::TOKEN::UNDEF();
+
 	if ( tokens.size() > 1 && tokens[1] == expr::OP_SET &&
 		tokens[0] == expr::T_VARIABLE && !tokens[0]._name.empty()) {
 

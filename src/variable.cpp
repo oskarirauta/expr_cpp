@@ -30,6 +30,33 @@ expr::VARIABLE::VARIABLE(const expr::VARIABLE& other) {
 	} else this -> emplace<std::nullptr_t>(std::forward<decltype(nullptr)>(nullptr));
 }
 
+expr::VARIABLE::VARIABLE(const std::variant<double, std::string, std::nullptr_t>&v) {
+
+	if ( std::holds_alternative<double>(v)) {
+
+		double d;
+		try {
+			d = std::get<double>(v);
+		} catch ( std::bad_variant_access const& err ) {
+			logger::error["convert"] << "bad variant access raised: " << err.what() << std::endl;
+			d = 0;
+		}
+
+		this -> emplace<double>(std::forward<decltype(d)>(d));
+	} else if ( std::holds_alternative<std::string>(v)) {
+
+		std::string s;
+		try {
+			s = std::get<std::string>(v);
+		} catch ( std::bad_variant_access const& err ) {
+			logger::error["convert"] << "bad variant access raised: " << err.what() << std::endl;
+			s = "";
+		}
+
+		this -> emplace<std::string>(std::forward<decltype(s)>(s));
+	} else this -> emplace<std::nullptr_t>(std::forward<decltype(nullptr)>(nullptr));
+}
+
 const expr::VAR_TYPE expr::VARIABLE::type() const {
 
 	if ( std::holds_alternative<double>(*this)) return expr::V_NUMBER;

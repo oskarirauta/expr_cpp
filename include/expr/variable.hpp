@@ -49,6 +49,7 @@ namespace expr {
 		VARIABLE(const double d);
 		VARIABLE(const std::string& s);
 		VARIABLE(const VARIABLE& other);
+		VARIABLE(const std::variant<double, std::string, std::nullptr_t>& v);
 
 		const std::string describe() const;
 		friend std::ostream& operator <<(std::ostream& os, VARIABLE const& v) {

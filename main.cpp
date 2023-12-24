@@ -74,6 +74,7 @@ int main(int argc, char **argv) {
 
 	//std::string s = "         myvar     = 'hello'";
 	std::string s = "s";
+	s = "";
 
 	expr::expression e(s);
 
@@ -101,5 +102,26 @@ int main(int argc, char **argv) {
 	}
 
 	std::cout << "result: " << result/*.lowercase()*/ << " description: " << describe(result) << std::endl;
+
+	std::cout << "\nExample with property helper:" << std::endl;
+	expr::PROPERTYMAP properties = {
+		{ "hello", "'hello world'" },
+		{ "world", "'hello ' . 'world'" },
+		{ "s1", "helloworld1" },
+		{ "s2", "hello world2" },
+		{ "s3", "'hello ' . world "},
+		{ "d1", "10" }
+	};
+
+	expr::PROPERTY property(&properties);
+
+	std::cout << "hello: " << property.pretty("hello") << " = " << property["hello"] << std::endl;
+	std::cout << "world: " << property.pretty("world") << " = " << property["world"] << std::endl;
+	std::cout << "s1: " << property.pretty("s1") << " = " << property["s1"] << std::endl;
+	std::cout << "s2: " << property.pretty("s2") << " = " << property["s2"] << std::endl;
+	std::cout << "d1: " << property.pretty("d1") << " = " << property["d1"] << std::endl;
+	std::cout << "d2: " << property.pretty("d2") << " = " << property["d2"] << std::endl;
+	std::cout << "d2: " << property.pretty("d2") << " = " << property["d2", "9"] << " (default: 9)" << std::endl;
+
 	return 0;
 }

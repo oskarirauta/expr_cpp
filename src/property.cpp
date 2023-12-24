@@ -6,9 +6,22 @@
 expr::PROPERTY::PROPERTY(common::lowercase_map<std::string> *m, expr::FUNCTIONMAP *f, expr::VARIABLEMAP *v) {
 
 	this -> _map = m;
-	this -> _funcs = f == nullptr ? &this -> no_funcs : f;
-	this -> _vars = v == nullptr ? &this -> no_vars : v;
+	this -> _funcs = f;
+	this -> _vars = v;
+}
 
+expr::PROPERTY::PROPERTY(common::lowercase_map<std::string> *m, expr::VARIABLEMAP *v) {
+
+	this -> _map = m;
+	this -> _funcs = nullptr;
+	this -> _vars = v;
+}
+
+expr::PROPERTY::PROPERTY(common::lowercase_map<std::string> *m) {
+
+	this -> _map = m;
+	this -> _funcs = nullptr;
+	this -> _vars = nullptr;
 }
 
 expr::PROPERTY::~PROPERTY() {
@@ -44,4 +57,32 @@ expr::RESULT expr::PROPERTY::operator [](const std::string& k, const std::varian
 	}
 
 	return expr::RESULT(def);
+}
+
+const std::string expr::PROPERTY::raw(const std::string& k) {
+
+	if ( k.empty() || this -> _map == nullptr || this -> _map -> empty() ||
+		!this -> _map -> contains(k) || (*this -> _map)[k].empty())
+		return "nullptr";
+
+	return (*this -> _map)[k];
+}
+
+const std::string expr::PROPERTY::pretty(const std::string& k) {
+
+	if ( k.empty() || this -> _map == nullptr || this -> _map -> empty() ||
+		!this -> _map -> contains(k) || (*this -> _map)[k].empty())
+		return "nullptr";
+
+	expr::expression e((*this -> _map)[k]);
+	return e.operator std::string();
+}
+
+const expr::expression expr::PROPERTY::expression(const std::string& k) {
+
+	if ( k.empty() || this -> _map == nullptr || this -> _map -> empty() ||
+		!this -> _map -> contains(k) || (*this -> _map)[k].empty())
+		return expr::expression();
+
+	return expr::expression((*this -> _map)[k]);
 }

@@ -19,6 +19,7 @@ namespace expr {
 		expr::VARIABLEMAP *_vars;
 
 	public:
+		PROPERTY();
 		PROPERTY(common::lowercase_map<std::string> *m, expr::FUNCTIONMAP *f, expr::VARIABLEMAP *v = nullptr);
 		PROPERTY(common::lowercase_map<std::string> *m, expr::VARIABLEMAP *v);
 		PROPERTY(common::lowercase_map<std::string> *m);

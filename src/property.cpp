@@ -3,6 +3,12 @@
 #include "expr/property.hpp"
 #include "expr/expression.hpp"
 
+expr::PROPERTY::PROPERTY() {
+	this -> _map = nullptr;
+	this -> _funcs = nullptr;
+	this -> _vars = nullptr;
+}
+
 expr::PROPERTY::PROPERTY(common::lowercase_map<std::string> *m, expr::FUNCTIONMAP *f, expr::VARIABLEMAP *v) {
 
 	this -> _map = m;

@@ -113,7 +113,9 @@ int main(int argc, char **argv) {
 		{ "d1", "10" }
 	};
 
-	expr::PROPERTY property(&properties);
+	expr::PROPERTY property;
+	property = expr::PROPERTY(&properties, &functions, &variables);
+	//expr::PROPERTY property(&properties, &functions, &variables);
 
 	std::cout << "hello: " << property.pretty("hello") << " = " << property["hello"] << std::endl;
 	std::cout << "world: " << property.pretty("world") << " = " << property["world"] << std::endl;

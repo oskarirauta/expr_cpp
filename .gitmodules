@@ -4,6 +4,3 @@
 [submodule "logger"]
 	path = logger
 	url = https://github.com/oskarirauta/logcpp.git
-[submodule "ordered-map"]
-	path = ordered-map
-	url = https://github.com/Tessil/ordered-map.git

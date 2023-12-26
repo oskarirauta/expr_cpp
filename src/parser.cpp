@@ -1,10 +1,11 @@
 #include <map>
+#include <unordered_map>
 #include "common.hpp"
 #include "logger.hpp"
 #include "expr/expression.hpp"
 
 // important note: longest operator patterns in the beginning, shortest in the end
-static std::map<std::string, expr::OP> Pattern1 = {
+static std::unordered_map<std::string, expr::OP> Pattern1 = {
 	{ "==", expr::OP_NEQ },
 	{ "!=", expr::OP_NNE },
 	{ "<=", expr::OP_NLE },
@@ -28,7 +29,7 @@ static std::map<std::string, expr::OP> Pattern1 = {
 };
 
 // important note: longest operator patterns in the beginning, shortest in the end
-static std::map<std::string, expr::OP> Pattern2 = {
+static std::unordered_map<std::string, expr::OP> Pattern2 = {
 	{ "eq", expr::OP_SEQ },
 	{ "ne", expr::OP_SNE },
 	{ "lt", expr::OP_SLT },

@@ -73,8 +73,8 @@ int main(int argc, char **argv) {
 	//std::string s = "myvar = 'hello'";
 
 	//std::string s = "         myvar     = 'hello'";
-	std::string s = "s";
-	s = "";
+	//std::string s = "s";
+	s = "1 == 1 ? 2 : 5";
 
 	expr::expression e(s);
 

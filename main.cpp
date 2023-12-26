@@ -31,49 +31,50 @@ int main(int argc, char **argv) {
 
 	std::cout << "evaluator++\n" << std::endl;
 
-	//std::string s = "1";
-	//std::string s = "  hello::a+   world 123 + 456\t'str1' \"str2\" func1() + func2('hello', 'world') + ('sub1' + 'sub2')";
-	//std::string s = "    999 +  1 + 1 + ( 5 + 2 )";
-	//std::string s = "1 + hello(1, 2, 5 + 6 + 9, (7 + 2))";
-	//std::string s = "1 + hello((1 + 1), 1 + ( 1 + 1), 1, 1 + hello(1, 1))";
-	//std::string s = "(1+1)";
-	//std::string s = "(xxx)";
-	//std::string s = "hello(1,1, 1 + 1)";
-	//std::string s = "hello(1, hello(1, hello(1)), 1) + 1 + hello(1 + xxx)";
-	//std::string s = "xxx";
-	//std::string s = "hello(xxx)";
-	//std::string s = "xxx + ( 10 + xxx + xxx + hello(xxx))";
-	//std::string s = "xxx + ( 10 + 10 )";
-	//std::string s = "xxx + 10 + 10";
-	//std::string s = "10 - 5";
-	//std::string s = "'hello' . ' ' . 'world'";
-	//std::string s = "'1' . '0' + 10";
-	//std::string s = "-1";
-	//std::string s = "-0";
-	//std::string s = "-(1 + 9)";
-	//std::string s = "-(-10 + 2)";
-	//std::string s = "5 + - - - 4";
-	//std::string s = "- - - - 5";
-	//std::string s = "2 * 5";
-	//std::string s = "10 / 0";
-	//std::string s = "0 / 10";
-	//std::string s = "10 / 2";
-	//std::string s = "1 < 0";
-	//std::string s = "bb ? ( 'hello ' . 'world' ) : 'not today'";
-	//std::string s = "? 1 : 0";
+	std::string s;
+	//s = "1";
+	//s = "  hello::a+   world 123 + 456\t'str1' \"str2\" func1() + func2('hello', 'world') + ('sub1' + 'sub2')";
+	//s = "    999 +  1 + 1 + ( 5 + 2 )";
+	//s = "1 + hello(1, 2, 5 + 6 + 9, (7 + 2))";
+	//s = "1 + hello((1 + 1), 1 + ( 1 + 1), 1, 1 + hello(1, 1))";
+	//s = "(1+1)";
+	//s = "(xxx)";
+	//s = "hello(1,1, 1 + 1)";
+	//s = "hello(1, hello(1, hello(1)), 1) + 1 + hello(1 + xxx)";
+	//s = "xxx";
+	//s = "hello(xxx)";
+	//s = "xxx + ( 10 + xxx + xxx + hello(xxx))";
+	//s = "xxx + ( 10 + 10 )";
+	//s = "xxx + 10 + 10";
+	//s = "10 - 5";
+	//s = "'hello' . ' ' . 'world'";
+	//s = "'1' . '0' + 10";
+	//s = "-1";
+	//s = "-0";
+	//s = "-(1 + 9)";
+	//s = "-(-10 + 2)";
+	//s = "5 + - - - 4";
+	//s = "- - - - 5";
+	//s = "2 * 5";
+	//s = "10 / 0";
+	//s = "0 / 10";
+	//s = "10 / 2";
+	//s = "1 < 0";
+	//s = "bb ? ( 'hello ' . 'world' ) : 'not today'";
+	//s = "? 1 : 0";
 
-	//std::string s = "Z = 150";
-	//std::string s = "!10";
-	//std::string s = "!-10";
-	//std::string s = "!!!!!!!!10";
-	//std::string s = "!!!!!!!!-10";
+	//s = "Z = 150";
+	//s = "!10";
+	//s = "!-10";
+	//s = "!!!!!!!!10";
+	//s = "!!!!!!!!-10";
 
-	//std::string s = "1 ++ 1";
-	//std::string s = "'HELLO WORLD'";
-	//std::string s = "myvar = 'hello'";
+	//s = "1 ++ 1";
+	//s = "'HELLO WORLD'";
+	//s = "myvar = 'hello'";
 
-	//std::string s = "         myvar     = 'hello'";
-	//std::string s = "s";
+	//s = "         myvar     = 'hello'";
+	//s = "s";
 	s = "1 == 1 ? 2 : 5";
 
 	expr::expression e(s);
@@ -124,6 +125,12 @@ int main(int argc, char **argv) {
 	std::cout << "d1: " << property.pretty("d1") << " = " << property["d1"] << std::endl;
 	std::cout << "d2: " << property.pretty("d2") << " = " << property["d2"] << std::endl;
 	std::cout << "d2: " << property.pretty("d2") << " = " << property["d2", "9"] << " (default: 9)" << std::endl;
+
+	std::cout << "\nIterate through property keys:" << std::endl;
+	for ( const std::string p : property ) {
+
+		std::cout << p << std::endl;
+	}
 
 	return 0;
 }

@@ -6,6 +6,11 @@ expr::VARIABLE::VARIABLE() {
 	this -> emplace<std::nullptr_t>(std::forward<decltype(nullptr)>(nullptr));
 }
 
+expr::VARIABLE::VARIABLE(const bool b) {
+	double d(b ? 1 : 0);
+	this -> emplace<double>(std::forward<decltype(d)>(d));
+}
+
 expr::VARIABLE::VARIABLE(const int i) {
 	double d(i);
 	this -> emplace<double>(std::forward<decltype(d)>(d));
@@ -83,6 +88,10 @@ const int expr::VARIABLE::raw_int() const {
 	return (int)this -> raw_double();
 }
 
+const bool expr::VARIABLE::raw_bool() const {
+	return this -> raw_int() == 0 ? false : true;
+}
+
 const std::string expr::VARIABLE::raw_string() const {
 
 	try {
@@ -133,6 +142,10 @@ expr::VARIABLE::operator double() const {
 	return n;
 }
 
+expr::VARIABLE::operator bool() const {
+	return ((int)(operator double())) == 0 ? false : true;
+}
+
 expr::VARIABLE::operator int() const {
 	return (int)(operator double());
 }
@@ -164,6 +177,10 @@ const double expr::VARIABLE::to_double() const {
 	return operator double();
 }
 
+const bool expr::VARIABLE::to_bool() const {
+	return operator bool();
+}
+
 const int expr::VARIABLE::to_int() const {
 	return operator int();
 }
@@ -181,6 +198,10 @@ const bool expr::VARIABLE::is_string() const {
 }
 
 const bool expr::VARIABLE::is_number() const {
+	return this -> type() == V_NUMBER;
+}
+
+const bool expr::VARIABLE::is_bool() const {
 	return this -> type() == V_NUMBER;
 }
 

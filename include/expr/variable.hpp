@@ -18,11 +18,13 @@ namespace expr {
 
 		const double raw_double() const;
 		const int raw_int() const;
+		const bool raw_bool() const;
 		const std::string raw_string() const;
 
 		const VARIABLE lowercase() const;
 
 		operator double() const;
+		operator bool() const;
 		operator int() const;
 		operator std::string() const;
 
@@ -31,12 +33,14 @@ namespace expr {
 		}
 
 		const double to_double() const;
+		const bool to_bool() const;
 		const int to_int() const;
 		const std::string to_string() const;
 
 		const bool is_null() const;
 		const bool is_string() const;
 		const bool is_number() const;
+		const bool is_bool() const;
 
 		constexpr VARIABLE& operator=(const int n) {
 			double d(n);
@@ -45,6 +49,7 @@ namespace expr {
 		}
 
 		VARIABLE();
+		VARIABLE(const bool b);
 		VARIABLE(const int i);
 		VARIABLE(const double d);
 		VARIABLE(const std::string& s);

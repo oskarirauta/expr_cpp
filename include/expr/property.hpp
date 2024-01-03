@@ -19,6 +19,8 @@ namespace expr {
 		expr::FUNCTIONMAP *_funcs;
 		expr::VARIABLEMAP *_vars;
 
+		expr::RESULT get(const std::string& key, const std::variant<double, std::string, std::nullptr_t>& def);
+
 	public:
 
 		class iterator {
@@ -48,11 +50,12 @@ namespace expr {
 		PROPERTY(common::lowercase_map<std::string> *m);
 		~PROPERTY();
 
-		expr::RESULT operator [](const std::string& k, const std::variant<double, std::string, std::nullptr_t>& def = nullptr);
+		expr::RESULT operator [](const std::string& key, const std::variant<double, std::string, std::nullptr_t>& def = nullptr);
+		expr::RESULT operator [](const std::string& key, const int def);
 
-		const std::string raw(const std::string& k);
-		const std::string pretty(const std::string& k);
-		const expr::expression expression(const std::string& k);
+		const std::string raw(const std::string& key);
+		const std::string pretty(const std::string& key);
+		const expr::expression expression(const std::string& key);
 
 	};
 

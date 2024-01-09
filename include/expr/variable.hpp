@@ -42,6 +42,10 @@ namespace expr {
 		const bool is_number() const;
 		const bool is_bool() const;
 
+		std::string string_convertible() const;
+		std::string number_convertible() const;
+		std::string null_convertible() const;
+
 		constexpr VARIABLE& operator=(const int n) {
 			double d(n);
 			this -> emplace<double>(std::forward<decltype(d)>(d));

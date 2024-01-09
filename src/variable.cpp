@@ -205,6 +205,82 @@ const bool expr::VARIABLE::is_bool() const {
 	return this -> type() == V_NUMBER;
 }
 
+std::string expr::VARIABLE::string_convertible() const {
+
+	if ( this -> type() == expr::V_STRING ) {
+
+		try {
+			std::string _tmp = std::get<std::string>(*this);
+		} catch ( std::bad_variant_access const& e ) {
+			return "string result failure: " + std::string(e.what());
+		}
+
+		return "";
+
+	} else if ( this -> type() == expr::V_NUMBER ) {
+
+		try {
+			std::get<double>(*this);
+		} catch ( std::bad_variant_access const& e ) {
+			return "number to string conversion failed: " + std::string(e.what());
+		}
+
+		return "";
+
+        } else if ( this -> type() == expr::V_NULLPTR )
+		return "nullptr value type is not string convertible";
+
+	return "undefined value type is not string convertible";
+}
+
+std::string expr::VARIABLE::number_convertible() const {
+
+	if ( this -> type() == expr::V_NUMBER ) {
+
+		try {
+			std::get<double>(*this);
+		} catch ( std::bad_variant_access const& e ) {
+			return "number result failure: " + std::string(e.what());
+		}
+
+		return "";
+
+	} else if ( this -> type() == expr::V_STRING ) {
+
+		std::string s;
+
+		try {
+			s = std::get<std::string>(*this);
+		} catch ( std::bad_variant_access const& e ) {
+			return "string to number conversion failed: " + std::string(e.what());
+		}
+
+		try {
+			std::stod(s);
+		} catch ( std::invalid_argument& e ) {
+			return "string '" + s + "' to number conversion failed: " + std::string(e.what());
+		}
+
+		return "";
+
+	} else if ( this -> type() == expr::V_NULLPTR )
+		return "nullptr value type is not number convertible";
+
+	return "undefined value type is not number convertible";
+}
+
+std::string expr::VARIABLE::null_convertible() const {
+
+	if ( this -> type() == expr::V_NULLPTR )
+		return "";
+	else if ( this -> type() == expr::V_STRING )
+		return "string value is not nullptr convertible";
+	else if ( this -> type() == expr::V_NUMBER )
+		return "number value is not nullptr convertible";
+
+	return "undefined value type is not nullptr convertible";
+}
+
 const std::string expr::VARIABLE::describe() const {
 
 	switch ( this -> type()) {

@@ -61,8 +61,7 @@ expr::RESULT expr::PROPERTY::get(const std::string& key, const std::variant<doub
 		} else if ( result.is_string() && result.operator std::string().empty()) {
 
 			if ( !std::holds_alternative<std::nullptr_t>(def))
-				std::cout << "from def nul - ";
-
+				return expr::RESULT(def);
 			else if ( !pretty.empty())
 				return expr::RESULT(expr::VARIABLE(pretty));
 		}

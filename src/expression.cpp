@@ -22,7 +22,6 @@ const std::string expr::expression::to_string() const {
 }
 
 void expr::expression::parse(const std::string& s) {
-	// todo: try
 	this -> _raw = s;
 	if ( this -> _tokens.empty())
 		this -> _tokens.push_back(expr::TOKEN::UNDEF());

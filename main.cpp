@@ -75,7 +75,8 @@ int main(int argc, char **argv) {
 
 	//s = "         myvar     = 'hello'";
 	//s = "s";
-	s = "1 == 1 ? 2 : 5";
+	//s = "1 == 1 ? 2 : 5";
+	s = "time::hour()";
 
 	expr::expression e(s);
 
@@ -84,8 +85,10 @@ int main(int argc, char **argv) {
 	std::cout << "expression: " << e << std::endl;
 
 	expr::FUNCTIONMAP functions = {
-		{ "hello", hello }
+		{ "hello", hello },
 	};
+
+	functions.append(expr::functions::common);
 
 	expr::VARIABLEMAP variables = {
 		{ "xxx", (double)10 },

@@ -152,15 +152,15 @@ std::vector<expr::TOKEN> expr::expression::eval_functions(
 
 			VARIABLE arg = nullptr;
 
-			// TODO: workaround if it doesn't exist?
+			if ( functions -> contains(tokens[i]._name)) {
 
-			if ( functions -> contains(tokens[i]._name))
 				arg = (*functions)[tokens[i]._name](f_args);
 
-			if ( std::holds_alternative<std::string>(arg))
-				tok._value = std::get<std::string>(arg);
-			else if ( std::holds_alternative<double>(arg))
-				tok._value = std::get<double>(arg);
+				if ( std::holds_alternative<std::string>(arg))
+					tok = std::get<std::string>(arg);
+				else if ( std::holds_alternative<double>(arg))
+					tok = std::get<double>(arg);
+			} else tok = "";
 
 			tokens[i] = tok;
 			return tokens;

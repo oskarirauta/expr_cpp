@@ -53,23 +53,23 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 		token.reset();
 		ignore = false;
 
-		while ( common::is_space(s))
+		while ( common::starts_with_space(s))
 			s.erase(0, 1);
 
 		if ( s.empty())
 			break;
 
-		if ( common::is_alpha(s)) { /* names */
+		if ( common::starts_with_alpha(s)) { /* names */
 
 			word += common::erase_front(s);
 
-			while ( common::is_alnum(s))
+			while ( common::starts_with_alnum(s))
 				word += common::erase_front(s);
 
 			if ( s.size() >= 3 && s.starts_with("::") && common::is_alnum(s.at(2))) {
 
 				word += common::erase_prefix(s, 3);
-				while ( common::is_alnum(s))
+				while ( common::starts_with_alnum(s))
 					word += common::erase_front(s);
 			}
 
@@ -87,22 +87,22 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 			if ( token == expr::T_VARIABLE )
 				token._name = word;
 
-		} else if ( common::is_digit(s) || ( s.front() == '.' && common::is_digit(s.at(1)))) { /* numbers */
+		} else if ( common::starts_with_digit(s) || ( s.front() == '.' && common::is_digit(s.at(1)))) { /* numbers */
 
-			while ( common::is_digit(s))
+			while ( common::starts_with_digit(s))
 				word += common::erase_front(s);
 
 			if ( s.front() == '.' ) {
 
 				word += common::erase_front(s);
 
-				while ( common::is_digit(s))
+				while ( common::starts_with_digit(s))
 					word += common::erase_front(s);
 			}
 
-			if ( common::is_alpha(s)) {
+			if ( common::starts_with_alpha(s)) {
 
-				while ( common::is_alnum(s))
+				while ( common::starts_with_alnum(s))
 					word += common::erase_front(s);
 
 				token = expr::T_VARIABLE;
@@ -339,7 +339,7 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 
 			s.erase(0, 1);
 
-			while (common::is_space(s))
+			while (common::starts_with_space(s))
 				s.erase(0, 1);
 
 			while ( !s.empty() && !cnd_complete ) {
@@ -379,7 +379,7 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 				expr1 = "0";
 			}
 
-			while (common::is_space(s))
+			while (common::starts_with_space(s))
                                 s.erase(0, 1);
 
 			escaping = false;
@@ -436,7 +436,7 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 		if ( !f_args && token == expr::T_UNDEF && !s.empty())
 			s.erase(0, 1);
 
-		while ( common::is_space(s))
+		while ( common::starts_with_space(s))
 			s.erase(0, 1);
 
 		// last checks..

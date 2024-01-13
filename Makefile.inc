@@ -3,6 +3,7 @@ INCLUDES += -I./$(EXPRCPP_DIR)/include
 
 EXPR_OBJS:= \
 	objs/expr_variable.o \
+	objs/expr_function.o \
 	objs/expr_result.o \
 	objs/expr_property.o \
 	objs/expr_token.o \
@@ -13,6 +14,9 @@ EXPR_OBJS:= \
 
 objs/expr_variable.o: $(EXPRCPP_DIR)/src/variable.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -o $@ $<;
+
+objs/expr_function.o: $(EXPRCPP_DIR)/src/function.cpp
+	 $(CXX) $(CXXFLAGS) $(INCLUDES) -c -o $@ $<;
 
 objs/expr_result.o: $(EXPRCPP_DIR)/src/result.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -o $@ $<;

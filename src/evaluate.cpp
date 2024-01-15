@@ -143,15 +143,11 @@ std::vector<expr::TOKEN> expr::expression::eval_functions(
 
 					VARIABLE arg;
 
-					std::cout << "DEBUG ARGS: " << args[a][0].to_double() << std::endl;
-
 					if ( args[a][0].is_number())
 						arg = args[a][0].to_double();
 					else if ( args[a][0].is_string())
 						arg = args[a][0].to_string();
 					else arg = nullptr;
-
-					std::cout << "DEBUG ARGS pushing: " << arg.to_double() << std::endl;
 
 					f_args.push_back(arg);
 
@@ -165,8 +161,6 @@ std::vector<expr::TOKEN> expr::expression::eval_functions(
 			VARIABLE arg = nullptr;
 
 			if ( functions -> contains(tokens[i]._name)) {
-
-				std::cout << "DEBUG ARGS: " << f_args[0] << std::endl;
 
 				arg = (*functions)[tokens[i]._name](f_args);
 

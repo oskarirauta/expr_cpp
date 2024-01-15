@@ -38,6 +38,8 @@ static tsl::ordered_map<std::string, expr::OP> Pattern2 = {
 	{ "ge", expr::OP_SGE }
 };
 
+static std::string unsupported_characters = "#$¢€:;@[]_\\";
+
 std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, bool f_args) {
 
 	std::string s(expr);
@@ -53,8 +55,24 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 		token.reset();
 		ignore = false;
 
-		while ( common::starts_with_space(s))
+		while ( common::starts_with_space(s)) // || unsupported_tokens.find_first_of(s.front()) != std::string::npos )
 			s.erase(0, 1);
+
+		if ( unsupported_characters.find_first_of(s.front()) != std::string::npos ) {
+
+			std::string ignored_word;
+
+			while ( unsupported_characters.find_first_of(s.front()) != std::string::npos )
+				ignored_word += s.erase(0, 1);
+
+			logger::warning["parser"] << "ignoring unsupported characters '" << ignored_word <<
+				"' at <" << expr << ">" << std::endl;
+
+			if ( tokens.size() > 1 && tokens.back() == expr::T_OPERATOR )
+				tokens.pop_back();
+
+			continue;
+		}
 
 		if ( s.empty())
 			break;
@@ -63,15 +81,8 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 
 			word += common::erase_front(s);
 
-			while ( common::starts_with_alnum(s))
+			while ( common::starts_with_alnum(s) || unsupported_characters.find_first_of(s.front()) != std::string::npos )
 				word += common::erase_front(s);
-
-			if ( s.size() >= 3 && s.starts_with("::") && common::is_alnum(s.at(2))) {
-
-				word += common::erase_prefix(s, 3);
-				while ( common::starts_with_alnum(s))
-					word += common::erase_front(s);
-			}
 
 			token = expr::T_VARIABLE;
 
@@ -455,6 +466,11 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 
 				ignore = true;
 			}
+		}
+
+		if ( !tokens.empty() && tokens.back() == expr::T_UNDEF && token == expr::T_UNDEF ) { // failsafe, but is it good..???
+			s.erase(0, 1);
+			ignore = true;
 		}
 
 		if ( !ignore )

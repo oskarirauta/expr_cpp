@@ -135,11 +135,15 @@ std::vector<expr::TOKEN> expr::expression::eval_functions(
 
 					VARIABLE arg;
 
+					std::cout << "DEBUG ARGS: " << args[a][0].to_double() << std::endl;
+
 					if ( args[a][0].is_number())
 						arg = args[a][0].to_double();
 					else if ( args[a][0].is_string())
 						arg = args[a][0].to_string();
 					else arg = nullptr;
+
+					std::cout << "DEBUG ARGS pushing: " << arg.to_double() << std::endl;
 
 					f_args.push_back(arg);
 
@@ -153,6 +157,8 @@ std::vector<expr::TOKEN> expr::expression::eval_functions(
 			VARIABLE arg = nullptr;
 
 			if ( functions -> contains(tokens[i]._name)) {
+
+				std::cout << "DEBUG ARGS: " << f_args[0] << std::endl;
 
 				arg = (*functions)[tokens[i]._name](f_args);
 
@@ -403,7 +409,9 @@ std::vector<expr::TOKEN> expr::expression::eval(
 			case expr::OP_ADD:
 				if ( tokens.size() > 2 ) {
 					process_rhs_token(tokens, 2, 3);
-					if ( tokens[0].is_string() && tokens[1].is_string())
+					if ( tokens[0].is_string() && tokens[2].is_string())
+						tokens[2] = expr::TOKEN::CAT(tokens[0].to_string(), tokens[2].to_string());
+					else if ( tokens[0].is_number() && tokens[2].is_string())
 						tokens[2] = expr::TOKEN::CAT(tokens[0].to_string(), tokens[2].to_string());
 					else
 						tokens[2] = expr::TOKEN::ADD(tokens[0].to_double(), tokens[2].to_double());
@@ -533,8 +541,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 
 				if ( tokens.size() > 2 ) {
 					process_rhs_token(tokens, 2, 3);
-
-					if ( tokens[0].is_string() && tokens[1].is_string())
+					if ( tokens[0].is_string() || tokens[2].is_string())
 						tokens[2] = expr::TOKEN::SEQ(tokens[0].to_string(), tokens[2].to_string());
 					else
 						tokens[2] = expr::TOKEN::NEQ(tokens[0].to_double(), tokens[2].to_double());
@@ -549,7 +556,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 
 				if ( tokens.size() > 2 ) {
 					process_rhs_token(tokens, 2, 3);
-					if ( tokens[0].is_string() && tokens[1].is_string())
+					if ( tokens[0].is_string() || tokens[2].is_string())
 						tokens[2] = expr::TOKEN::SNE(tokens[0].to_string(), tokens[2].to_string());
 					else
 						tokens[2] = expr::TOKEN::NNE(tokens[0].to_double(), tokens[2].to_double());
@@ -564,7 +571,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 
 				if ( tokens.size() > 2 ) {
 					process_rhs_token(tokens, 2, 3);
-					if ( tokens[0].is_string() && tokens[1].is_string())
+					if ( tokens[0].is_string() || tokens[2].is_string())
 						tokens[2] = expr::TOKEN::SLT(tokens[0].to_string(), tokens[2].to_string());
 					else
 						tokens[2] = expr::TOKEN::NLT(tokens[0].to_double(), tokens[2].to_double());
@@ -579,7 +586,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 
 				if ( tokens.size() > 2 ) {
 					process_rhs_token(tokens, 2, 3);
-					if ( tokens[0].is_string() && tokens[1].is_string())
+					if ( tokens[0].is_string() || tokens[2].is_string())
 						tokens[2] = expr::TOKEN::SLE(tokens[0].to_string(), tokens[2].to_string());
 					else
 						tokens[2] = expr::TOKEN::NLE(tokens[0].to_double(), tokens[2].to_double());
@@ -594,7 +601,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 
 				if ( tokens.size() > 2 ) {
 					process_rhs_token(tokens, 2, 3);
-					if ( tokens[0].is_string() && tokens[1].is_string())
+					if ( tokens[0].is_string() || tokens[2].is_string())
 						tokens[2] = TOKEN::SGT(tokens[0].to_string(), tokens[2].to_string());
 					else
 						tokens[2] = TOKEN::NGT(tokens[0].to_double(), tokens[2].to_double());
@@ -609,7 +616,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 
 				if ( tokens.size() > 2 ) {
 					process_rhs_token(tokens, 2, 3);
-					if ( tokens[0].is_string() && tokens[1].is_string())
+					if ( tokens[0].is_string() || tokens[2].is_string())
 						tokens[2] = TOKEN::SGE(tokens[0].to_string(), tokens[2].to_string());
 					else
 						tokens[2] = TOKEN::NGE(tokens[0].to_double(), tokens[2].to_double());
@@ -625,10 +632,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 
 				if ( tokens.size() > 2 ) {
 					process_rhs_token(tokens, 2, 3);
-					if ( tokens[0].is_number() && tokens[1].is_number())
-						tokens[2] = expr::TOKEN::NEQ(tokens[0].to_double(), tokens[2].to_double());
-					else
-						tokens[2] = expr::TOKEN::SEQ(tokens[0].to_string(), tokens[2].to_string());
+					tokens[2] = expr::TOKEN::SEQ(tokens[0].to_string(), tokens[2].to_string());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
 					logger::error["evaluate"] << "operator SEQ(eq) with missing right side value" << std::endl;
@@ -640,10 +644,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 
 				if ( tokens.size() > 2 ) {
 					process_rhs_token(tokens, 2, 3);
-					if ( tokens[0].is_number() && tokens[1].is_number())
-						tokens[2] = expr::TOKEN::NNE(tokens[0].to_double(), tokens[2].to_double());
-					else
-						tokens[2] = expr::TOKEN::SNE(tokens[0].to_string(), tokens[2].to_string());
+					tokens[2] = expr::TOKEN::SNE(tokens[0].to_string(), tokens[2].to_string());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
 					logger::error["evaluate"] << "operator SNE(ne) with missing right side value" << std::endl;
@@ -655,10 +656,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 
 				if ( tokens.size() > 2 ) {
 					process_rhs_token(tokens, 2, 3);
-					if ( tokens[0].is_number() && tokens[1].is_number())
-						tokens[2] = expr::TOKEN::NLT(tokens[0].to_double(), tokens[2].to_double());
-					else
-						tokens[2] = expr::TOKEN::SLT(tokens[0].to_string(), tokens[2].to_string());
+					tokens[2] = expr::TOKEN::SLT(tokens[0].to_string(), tokens[2].to_string());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
 					logger::error["evaluate"] << "operator SLT(lt) with missing right side value" << std::endl;
@@ -670,10 +668,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 
 				if ( tokens.size() > 2 ) {
 					process_rhs_token(tokens, 2, 3);
-					if ( tokens[0].is_number() && tokens[1].is_number())
-						tokens[2] = expr::TOKEN::NLE(tokens[0].to_double(), tokens[2].to_double());
-					else
-						tokens[2] = expr::TOKEN::SLE(tokens[0].to_string(), tokens[2].to_string());
+					tokens[2] = expr::TOKEN::SLE(tokens[0].to_string(), tokens[2].to_string());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
 					logger::error["evaluate"] << "operator SLE(le) with missing right side value" << std::endl;
@@ -685,10 +680,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 
 				if ( tokens.size() > 2 ) {
 					process_rhs_token(tokens, 2, 3);
-					if ( tokens[0].is_number() && tokens[1].is_number())
-						tokens[2] = expr::TOKEN::NGT(tokens[0].to_double(), tokens[2].to_double());
-					else
-						tokens[2] = expr::TOKEN::SGT(tokens[0].to_string(), tokens[2].to_string());
+					tokens[2] = expr::TOKEN::SGT(tokens[0].to_string(), tokens[2].to_string());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
 					logger::error["evaluate"] << "operator SGT(gt) with missing right side value" << std::endl;
@@ -700,10 +692,7 @@ std::vector<expr::TOKEN> expr::expression::eval(
 
 				if ( tokens.size() > 2 ) {
 					process_rhs_token(tokens, 2, 3);
-					if ( tokens[0].is_number() && tokens[1].is_number())
-						tokens[2] = expr::TOKEN::NGE(tokens[0].to_double(), tokens[2].to_double());
-					else
-						tokens[2] = expr::TOKEN::SGE(tokens[0].to_string(), tokens[2].to_string());
+					tokens[2] = expr::TOKEN::SGE(tokens[0].to_string(), tokens[2].to_string());
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
 					logger::error["evaluate"] << "operator SGE(>=) with missing right side value" << std::endl;

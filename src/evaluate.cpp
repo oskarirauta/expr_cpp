@@ -47,6 +47,14 @@ expr::TOKEN expr::expression::tokenize_variable_value(const std::string& name, e
 		tok = (double)1;
 	} else if ( !name.empty() && common::to_lower(std::as_const(name)) == "false" ) {
 		tok = (double)0;
+	} else if ( !name.empty() && common::to_lower(std::as_const(name)) == "pi" ) {
+		tok = (double)M_PI;
+	} else if ( !name.empty() && common::to_lower(std::as_const(name)) == "pi_2" ) {
+		tok = (double)M_PI_2;
+	} else if ( !name.empty() && common::to_lower(std::as_const(name)) == "pi_4" ) {
+		tok = (double)M_PI_4;
+	} else if ( !name.empty() && common::to_lower(std::as_const(name)) == "e" ) {
+		tok = (double)M_E;
 	}
 
 	if ( tok == T_UNDEF ) tok = TOKEN::STRING("");

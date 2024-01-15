@@ -77,7 +77,7 @@ std::vector<expr::TOKEN> expr::expression::eval_functions(
 			return tokens;
 		}
 
-		if ( functions -> contains(tokens[i]._name)) {
+		if ( functions -> contains(tokens[i]._name) || expr::functions::builtin_functions.contains(tokens[i]._name)) {
 
 			std::vector<std::vector<expr::TOKEN>> args = get_arg_tokens(tokens[i]._args);
 			FUNCTION_ARGS f_args;
@@ -168,6 +168,18 @@ std::vector<expr::TOKEN> expr::expression::eval_functions(
 					tok = std::get<std::string>(arg);
 				else if ( std::holds_alternative<double>(arg))
 					tok = std::get<double>(arg);
+				else tok = "";
+
+			} else if ( expr::functions::builtin_functions.contains(tokens[i]._name)) {
+
+				arg = expr::functions::builtin_functions[tokens[i]._name](f_args);
+
+				if ( std::holds_alternative<std::string>(arg))
+					tok = std::get<std::string>(arg);
+				else if ( std::holds_alternative<double>(arg))
+					tok = std::get<double>(arg);
+				else tok = "";
+
 			} else tok = "";
 
 			tokens[i] = tok;

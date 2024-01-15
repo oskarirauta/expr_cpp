@@ -6,12 +6,12 @@
 #include "logger.hpp"
 #include "expr/expression.hpp"
 
-expr::VARIABLE hello(expr::FUNCTION_ARGS args) {
+expr::VARIABLE hello(const expr::FUNCTION_ARGS& args) {
 
 	expr::VARIABLE ret = 0;
 	int i = 0;
 
-	for ( expr::VARIABLE& arg : args ) {
+	for ( const expr::VARIABLE& arg : args ) {
 		i++;
 		if ( arg == expr::V_NULLPTR )
 			std::cout << "problem: arg #" << i << " is null" << std::endl;
@@ -76,7 +76,18 @@ int main(int argc, char **argv) {
 	//s = "         myvar     = 'hello'";
 	//s = "s";
 	//s = "1 == 1 ? 2 : 5";
-	s = "time::hour()";
+	//s = "1 . to_string()";
+	//s = "to_string(date::day()) . 'test'";// . date::month()";//.'.'. date::year() . ' ' . time::hour() . ':' . time::min()";
+	//s = "5 . 'hello' . 6";
+	//s = "5 . '.' . 6";
+	//s = "to_string(date::day()) . '.' . to_string(date::month()) . '.'. to_string(date::year()) . ' ' . to_string(time::hour()) .':' . to_string(time::min())";
+	//s = "5.1 + 0.2 - 'hello'";
+	//s = "10 + pi";
+	//s = "time()";
+	//s = "to_string(time())";
+	//s = "strftime('%Y-%m-%d', 1705345375)";
+	//s = "strftime('%Y-%m-%d', time()-500000)";
+	s = "strftime('%Y-%m-%d')";
 
 	expr::expression e(s);
 
@@ -88,12 +99,11 @@ int main(int argc, char **argv) {
 		{ "hello", hello },
 	};
 
-	functions.append(expr::functions::common);
-
 	expr::VARIABLEMAP variables = {
-		{ "xxx", (double)10 },
+		{ "xxx", (double)10.5 },
 		{ "bb", (double)1 },
 		{ "s", "hello world" },
+		{ "x$date", 9 },
 	};
 
 	expr::RESULT result;

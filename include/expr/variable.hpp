@@ -46,12 +46,6 @@ namespace expr {
 		std::string number_convertible() const;
 		std::string null_convertible() const;
 
-		constexpr VARIABLE& operator=(const int n) {
-			double d(n);
-			this -> emplace<double>(std::forward<decltype(d)>(d));
-			return *this;
-		}
-
 		VARIABLE();
 		VARIABLE(const bool b);
 		VARIABLE(const int i);

@@ -1,6 +1,13 @@
 # expr_cpp
 expression evalution library for C++
 
+[![C++ CI build](https://github.com/oskarirauta/expr_cpp/actions/workflows/build.yml/badge.svg)](https://github.com/oskarirauta/expr_cpp/actions/workflows/build.yml)
+
+### Requirement
+Relatively new gcc/g++ version is required for building, meaning that
+minimum version to build succesfully is gcc-13. Best results when
+built with parameter ```--std=c++23```
+
 More or less, a modern c++ version of expression evaluator used
 in lcd4linux. One could say that this is a fork, but it isn't
 as it's completely hand-written from scratch just following
@@ -23,6 +30,7 @@ included with other projects. On it's own, this is useful
 mostly for demonstration purposes.
 
 ### depencies
+ - gcc 13 or newer and c++ standard c++20 or newer, c++23 recommended
  - common: [https://github.com/oskarirauta/common_cpp.git](https://github.com/oskarirauta/common_cpp)
  - logger: [https://github.com/oskarirauta/logcpp.git](https://github.com/oskarirauta/logcpp)
 

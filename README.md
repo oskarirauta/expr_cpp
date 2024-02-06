@@ -8,6 +8,8 @@ Relatively new gcc/g++ version is required for building, meaning that
 minimum version to build succesfully is gcc-13. Best results when
 built with parameter ```--std=c++23```
 
+### Description
+
 More or less, a modern c++ version of expression evaluator used
 in lcd4linux. One could say that this is a fork, but it isn't
 as it's completely hand-written from scratch just following

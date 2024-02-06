@@ -14,9 +14,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: updata package database
-      run: apt-get update
+      run: sudo apt-get update
     - name: update gcc
-      run: apt-get upgrade gcc
+      run: |
+        sudo apt-get upgrade gcc
     - name: check gcc version
       run: gcc -v
     - name: submodules

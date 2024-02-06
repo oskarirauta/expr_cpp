@@ -75,6 +75,7 @@ expr::RESULT expr::PROPERTY::get(const std::string& key, const std::variant<doub
 	return expr::RESULT(def);
 }
 
+#if __cplusplus > 202002L
 expr::RESULT expr::PROPERTY::operator [](const std::string& key, const std::variant<double, std::string, std::nullptr_t>& def) {
 
 	return this -> get(key, def);
@@ -83,6 +84,39 @@ expr::RESULT expr::PROPERTY::operator [](const std::string& key, const std::vari
 expr::RESULT expr::PROPERTY::operator [](const std::string& key, const int def) {
 
 	return this -> get(key, (double)def);
+}
+#else
+expr::RESULT expr::PROPERTY::operator [](const std::string& key) {
+
+	return this -> get(key, nullptr);
+}
+#endif
+
+expr::RESULT expr::PROPERTY::operator [](const std::pair<std::string, double>& p) {
+
+	std::variant<double, std::string, std::nullptr_t> def = p.second;
+	return this -> get(p.first, def);
+}
+
+expr::RESULT expr::PROPERTY::operator [](const std::initializer_list<std::string>& l) {
+
+	std::vector<std::string> vec;
+	for ( auto s : l )
+		vec.push_back(s);
+
+	return this -> get(vec[0], vec[1]);
+}
+
+expr::RESULT expr::PROPERTY::operator [](const std::pair<std::string, std::nullptr_t>& p) {
+
+	std::variant<double, std::string, std::nullptr_t> def = p.second;
+	return this -> get(p.first, def);
+}
+
+expr::RESULT expr::PROPERTY::operator [](const std::pair<std::string, int>& p) {
+
+	std::variant<double, std::string, std::nullptr_t> def = (double)p.second;
+	return this -> get(p.first, def);
 }
 
 const std::string expr::PROPERTY::raw(const std::string& key) {

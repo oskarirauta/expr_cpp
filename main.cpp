@@ -137,7 +137,11 @@ int main(int argc, char **argv) {
 	std::cout << "s2: " << property.pretty("s2") << " = " << property["s2"] << std::endl;
 	std::cout << "d1: " << property.pretty("d1") << " = " << property["d1"] << std::endl;
 	std::cout << "d2: " << property.pretty("d2") << " = " << property["d2"] << std::endl;
+	#if __cplusplus > 202002L
 	std::cout << "d2: " << property.pretty("d2") << " = " << property["d2", "9"] << " (default: 9)" << std::endl;
+	#else
+	std::cout << "d2: " << property.pretty("d2") << " = " << property[{"d2", "9"}] << " (default: 9)" << std::endl;
+	#endif
 
 	std::cout << "\nIterate through property keys:" << std::endl;
 	for ( const std::string p : property ) {

@@ -50,8 +50,17 @@ namespace expr {
 		PROPERTY(common::lowercase_map<std::string> *m);
 		~PROPERTY();
 
+		#if __cplusplus > 202002L
 		expr::RESULT operator [](const std::string& key, const std::variant<double, std::string, std::nullptr_t>& def = nullptr);
 		expr::RESULT operator [](const std::string& key, const int def);
+		#else
+		expr::RESULT operator [](const std::string& key);
+		#endif
+
+		expr::RESULT operator [](const std::pair<std::string, double>& p);
+		expr::RESULT operator [](const std::initializer_list<std::string>& l);
+		expr::RESULT operator [](const std::pair<std::string, std::nullptr_t>& p);
+		expr::RESULT operator [](const std::pair<std::string, int>& p);
 
 		const std::string raw(const std::string& key);
 		const std::string pretty(const std::string& key);

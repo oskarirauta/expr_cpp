@@ -44,7 +44,13 @@ namespace expr {
 
 		std::string string_convertible() const;
 		std::string number_convertible() const;
+		std::string bool_convertible() const;
 		std::string null_convertible() const;
+
+		const bool is_string_convertible() const;
+		const bool is_number_convertible() const;
+		const bool is_bool_convertible() const;
+		const bool is_null_convertible() const;
 
 		VARIABLE();
 		VARIABLE(const bool b);

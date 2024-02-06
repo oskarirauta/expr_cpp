@@ -269,6 +269,11 @@ std::string expr::VARIABLE::number_convertible() const {
 	return "undefined value type is not number convertible";
 }
 
+std::string expr::VARIABLE::bool_convertible() const {
+
+	return this -> number_convertible();
+}
+
 std::string expr::VARIABLE::null_convertible() const {
 
 	if ( this -> type() == expr::V_NULLPTR )
@@ -279,6 +284,26 @@ std::string expr::VARIABLE::null_convertible() const {
 		return "number value is not nullptr convertible";
 
 	return "undefined value type is not nullptr convertible";
+}
+
+const bool expr::VARIABLE::is_string_convertible() const {
+
+	return this -> string_convertible().empty();
+}
+
+const bool expr::VARIABLE::is_number_convertible() const {
+
+	return this -> number_convertible().empty();
+}
+
+const bool expr::VARIABLE::is_bool_convertible() const {
+
+	return this -> number_convertible().empty();
+}
+
+const bool expr::VARIABLE::is_null_convertible() const {
+
+	return this -> null_convertible().empty();
 }
 
 const std::string expr::VARIABLE::describe() const {

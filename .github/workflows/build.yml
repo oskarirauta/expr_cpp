@@ -17,7 +17,9 @@ jobs:
       run: sudo apt-get update
     - name: update gcc
       run: |
-        sudo apt-get upgrade gcc
+        sudo apt-get install gcc-13 g++-13
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 100 --slave /usr/bin/g++ g++ /usr/bin/g++-13 --slave /usr/bin/gcov gcov /usr/bin/gcov-13
+        sudo update-alternatives --set gcc /usr/bin/gcc-13
     - name: check gcc version
       run: gcc -v
     - name: submodules

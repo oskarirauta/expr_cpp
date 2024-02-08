@@ -536,7 +536,19 @@ std::vector<expr::TOKEN> expr::expression::eval(
 				break;
 
 			/* logical operators */
-			case OP_OR:
+			case OP_OR2:
+
+				if ( tokens.size() > 2 ) {
+					process_rhs_token(tokens, 2, 3);
+					tokens[2] = expr::TOKEN::OR2(tokens[0].to_double(), tokens[2].to_double());
+					tokens.erase(tokens.begin(), tokens.begin() + 2);
+				} else {
+					logger::error["evaluate"] << "operator OR(|) with missing right side value" << std::endl;
+					tokens.erase(tokens.begin() + 1);
+				}
+				break;
+
+			case OP_OR: // same as OP_OR2, but symbol is & instead of &&
 
 				if ( tokens.size() > 2 ) {
 					process_rhs_token(tokens, 2, 3);
@@ -544,6 +556,19 @@ std::vector<expr::TOKEN> expr::expression::eval(
 					tokens.erase(tokens.begin(), tokens.begin() + 2);
 				} else {
 					logger::error["evaluate"] << "operator OR(|) with missing right side value" << std::endl;
+					tokens.erase(tokens.begin() + 1);
+				}
+				break;
+
+
+			case OP_AND2:
+
+				if ( tokens.size() > 2 ) {
+					process_rhs_token(tokens, 2, 3);
+					tokens[2] = expr::TOKEN::AND2(tokens[0].to_double(), tokens[2].to_double());
+					tokens.erase(tokens.begin(), tokens.begin() + 2);
+				} else {
+					logger::error["evaluate"] << "operator AND(&) with missing right side value" << std::endl;
 					tokens.erase(tokens.begin() + 1);
 				}
 				break;

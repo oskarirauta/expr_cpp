@@ -227,6 +227,9 @@ const std::string describe(const expr::OP& op) {
 
 		case expr::OP_COM: return ",";
 
+		case expr::OP_AND2: return "&&";
+		case expr::OP_OR2: return "||";
+
 		case expr::OP_NEQ: return "==";
 		case expr::OP_NNE: return "!=";
 		case expr::OP_NLT: return "<";

@@ -17,7 +17,8 @@ namespace expr {
 
 	enum OP {
 		OP_UNDEF,
-		OP_OR, OP_AND, OP_NOT, OP_NNOT,
+		OP_OR, OP_OR2, OP_AND, OP_AND2,
+		OP_NOT, OP_NNOT,
 		OP_ADD, OP_SUB, OP_CAT, OP_MUL, OP_DIV, OP_MOD, OP_POW,
 		OP_NEQ, OP_NNE, OP_NLT, OP_NLE, OP_NGT, OP_NGE,
 		OP_SEQ, OP_SNE, OP_SLT, OP_SLE, OP_SGT, OP_SGE,
@@ -104,9 +105,13 @@ namespace expr {
 
 		static TOKEN SGN(const double n);
 		static TOKEN OR(const double n1, const double n2);
+		static TOKEN OR2(const double n1, const double n2);
 		static TOKEN AND(const double n1, const double n2);
+		static TOKEN AND2(const double n1, const double n2);
 		static TOKEN NOT(const double n);
+		static TOKEN NOT2(const double n);
 		static TOKEN NNOT(const double n);
+		static TOKEN NNOT2(const double n);
 		static TOKEN ADD(const double n1, const double n2);
 		static TOKEN SUB(const double n1, const double n2);
 		static TOKEN CAT(const std::string& s1, const std::string& s2);

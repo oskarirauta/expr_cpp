@@ -12,6 +12,8 @@ static tsl::ordered_map<std::string, expr::OP> Pattern1 = {
 	{ "=<", expr::OP_NLE },
 	{ ">=", expr::OP_NGE },
 	{ "=>", expr::OP_NGE },
+	{ "&&", expr::OP_AND2 },
+	{ "||", expr::OP_OR2 },
 	{ "<", expr::OP_NLT },
 	{ ">", expr::OP_NGT },
 	{ "|", expr::OP_OR },

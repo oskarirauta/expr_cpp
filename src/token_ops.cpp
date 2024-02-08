@@ -83,12 +83,22 @@ expr::TOKEN expr::TOKEN::OR(const double n1, const double n2) {
 	return token;
 }
 
+expr::TOKEN expr::TOKEN::OR2(const double n1, const double n2) {
+
+	return expr::TOKEN::OR(n1, n2);
+}
+
 expr::TOKEN expr::TOKEN::AND(const double n1, const double n2) {
 
 	expr::TOKEN token;
 	token._type = expr::T_NUMBER;
 	token._value = n1 != 0 ? (double)( n2 != 0 ) : (double)0;
 	return token;
+}
+
+expr::TOKEN expr::TOKEN::AND2(const double n1, const double n2) {
+
+	return expr::TOKEN::AND(n1, n2);
 }
 
 expr::TOKEN expr::TOKEN::NOT(const double n) {

@@ -87,7 +87,8 @@ int main(int argc, char **argv) {
 	//s = "to_string(time())";
 	//s = "strftime('%Y-%m-%d', 1705345375)";
 	//s = "strftime('%Y-%m-%d', time()-500000)";
-	s = "strftime('%Y-%m-%d')";
+	//s = "strftime('%Y-%m-%d')";
+	s = "(1 == 1 ? 1 : 0) && (0 == 1 ? 1 : 0) ? 'true' : 'false'";
 
 	expr::expression e(s);
 
@@ -114,6 +115,9 @@ int main(int argc, char **argv) {
 		result = nullptr;
 		std::cout << "runtime error, " << e.what() << std::endl;
 	}
+
+	std::cout << "result: " << result << "\n" << std::endl;
+	return 0;
 
 	std::cout << "result: " << result/*.lowercase()*/ << " description: " << describe(result) << std::endl;
 

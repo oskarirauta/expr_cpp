@@ -218,6 +218,11 @@ std::vector<expr::TOKEN> expr::expression::eval_parentheses(std::vector<expr::TO
 	// evaluate parentheses
 	for ( size_t i = 0; i < tokens.size(); i++ ) {
 
+		begin_loop:
+
+		if ( tokens[i] != expr::T_SUB )
+			continue;
+
 		begin_evaluate:
 
 		if ( tokens[i] == expr::T_SUB && tokens[i]._child.size() > 1 ) {
@@ -238,15 +243,25 @@ std::vector<expr::TOKEN> expr::expression::eval_parentheses(std::vector<expr::TO
 		}
 
 		if ( tokens[i] == expr::T_SUB && tokens[i]._child.size() == 1 ) {
+
 			if ( tokens[i]._child[0] == expr::T_UNDEF ) {
+
 				logger::error["evaluate"] << "error while evaluating parentheses, result was null" << std::endl;
 				tokens.erase(i == 0 ? tokens.begin() : ( tokens.begin() + i ));
+
 			} else tokens[i] = tokens[i]._child[0];
-			return tokens;
+
+			i = 0;
+			goto begin_loop;
+
 		} else if ( tokens[i] == expr::T_SUB && tokens[i]._child.size() == 0 ) {
+
 			logger::error["evaluate"] << "cannot evaluate value inside parentheses, it is considered as null" << std::endl;
+
 			tokens.erase(i == 0 ? tokens.begin() : ( tokens.begin() + i ));
-			return tokens;
+
+			i = 0;
+			goto begin_loop;
 		}
 	}
 

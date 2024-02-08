@@ -87,7 +87,7 @@ expr::TOKEN expr::TOKEN::AND(const double n1, const double n2) {
 
 	expr::TOKEN token;
 	token._type = expr::T_NUMBER;
-	token._value = 1 != 0 ? (double)( n2 != 0 ) : (double)0;
+	token._value = n1 != 0 ? (double)( n2 != 0 ) : (double)0;
 	return token;
 }
 

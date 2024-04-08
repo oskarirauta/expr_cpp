@@ -2,8 +2,9 @@ all: world
 
 CXX?=g++
 CXXFLAGS?=--std=c++17 -Wall -fPIC -g
-LDFLAGS?=-L/lib -L/usr/lib
-INCLUDES+= -I.
+
+OBJS:= \
+	objs/main.o
 
 EXPRCPP_DIR:=.
 include common/Makefile.inc
@@ -12,12 +13,14 @@ include Makefile.inc
 
 world: example
 
+$(shell mkdir -p objs)
+
 objs/main.o: main.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -o $@ $<;
 
-example: $(COMMON_OBJS) $(LOGGER_OBJS) $(EXPR_OBJS) objs/main.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -L. $(LIBS) $^ -o $@;
+example: $(COMMON_OBJS) $(LOGGER_OBJS) $(EXPR_OBJS) $(OBJS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@;
 
 .PHONY: clean
 clean:
-	rm -f objs/*.o example
+	@rm -rf objs example

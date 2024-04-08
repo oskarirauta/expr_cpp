@@ -1,5 +1,5 @@
-EXPRCPP_DIR?=expr
-INCLUDES += -I./$(EXPRCPP_DIR)/include
+EXPRCPP_DIR?=./expr
+INCLUDES += -I$(EXPRCPP_DIR)/include
 
 EXPR_OBJS:= \
 	objs/expr_variable.o \

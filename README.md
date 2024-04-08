@@ -1,14 +1,10 @@
-# expr_cpp
+[![License:MIT](https://img.shields.io/badge/License-MIT-blue?style=plastic)](LICENSE)
+[![C++ CI build](../../actions/workflows/build.yml/badge.svg)](../../actions/workflows/build.yml)
+### expr_cpp
+
 expression evalution library for C++
 
-[![C++ CI build](https://github.com/oskarirauta/expr_cpp/actions/workflows/build.yml/badge.svg)](https://github.com/oskarirauta/expr_cpp/actions/workflows/build.yml)
-
-### Requirement
-Relatively new gcc/g++ version is required for building, meaning that
-minimum version to build succesfully is gcc-13. Best results when
-built with parameter ```--std=c++23```
-
-### Description
+## <sub>Description</sub>
 
 More or less, a modern c++ version of expression evaluator used
 in lcd4linux. One could say that this is a fork, but it isn't
@@ -31,13 +27,13 @@ This will be written as a git submodule that can be easily
 included with other projects. On it's own, this is useful
 mostly for demonstration purposes.
 
-### depencies
- - gcc 13 or newer and c++ standard c++20 or newer, c++23 recommended
+## <sub>Depencies</sub>
+
  - common: [https://github.com/oskarirauta/common_cpp.git](https://github.com/oskarirauta/common_cpp)
- - logger: [https://github.com/oskarirauta/logcpp.git](https://github.com/oskarirauta/logcpp)
+ - logger: [https://github.com/oskarirauta/logger_cpp.git](https://github.com/oskarirauta/logger_cpp)
 
-### development status
-on-going; but works pretty nicely and is usable.
+## <sub>Example</sub>
 
-### license
-MIT
+Some testing code and usage example is provided
+
+

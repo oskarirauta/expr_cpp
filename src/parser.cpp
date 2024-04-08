@@ -257,7 +257,7 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 
 			for ( const auto& [key, op] : Pattern1 ) {
 
-				if ( s.size() >= key.size() && s.starts_with(key)) {
+				if ( s.size() >= key.size() && common::has_prefix(s, key)) {
 
 					if ( op == expr::OP_COM && !f_args ) {
 						logger::warning["parser"] <<

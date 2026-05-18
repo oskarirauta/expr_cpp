@@ -100,7 +100,7 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 			if ( token == expr::T_VARIABLE )
 				token._name = word;
 
-		} else if ( common::starts_with_digit(s) || ( s.front() == '.' && common::is_digit(s.at(1)))) { /* numbers */
+		} else if ( common::starts_with_digit(s) || ( s.front() == '.' && s.size() > 1 && common::is_digit(s.at(1)))) { /* numbers */
 
 			while ( common::starts_with_digit(s))
 				word += common::erase_front(s);
@@ -181,13 +181,14 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 
 								for ( i = 0; i < 2; i++ ) {
 
+									if ( s.size() <= (size_t)(2 + i) ) break;
 									hexC = s.at(2 + i);
 
 									if ( hexC >= '0' && hexC <= '9' )
 										hex[i] = hexC - '0';
-									if ( hexC >= 'a' && hexC <= 'f' )
+									else if ( hexC >= 'a' && hexC <= 'f' )
 										hex[i] = hexC - 'a' + 10;
-									if ( hexC >= 'A' && hexC <= 'F' )
+									else if ( hexC >= 'A' && hexC <= 'F' )
 										hex[i] = hexC - 'A' + 10;
 									else break;
 								}

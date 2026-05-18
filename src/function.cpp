@@ -1,7 +1,11 @@
 #include <ctime>
 #include <iomanip>
 #include <cstring>
+#include <cmath>
+#include <sstream>
+#include <algorithm>
 
+#include "common.hpp"
 #include "logger.hpp"
 #include "expr/function.hpp"
 
@@ -240,15 +244,7 @@ expr::VARIABLE expr::functions::ceil(const expr::FUNCTION_ARGS& args) {
 expr::VARIABLE expr::functions::round(const expr::FUNCTION_ARGS& args) {
 
 	double d = args.empty() ? (double)0 : arg_to_double(args[0]);
-	int i;
-
-	if ( d > 0 )
-		i = (int)(d + 0.5);
-	else if ( d < 0 )
-		i = (int)(d - 0.5);
-	else i = 0;
-
-	return i;
+	return (double)std::lround(d);
 }
 
 expr::VARIABLE expr::functions::strlen(const expr::FUNCTION_ARGS& args) {
@@ -374,11 +370,297 @@ expr::VARIABLE expr::functions::substr(const expr::FUNCTION_ARGS& args) {
 	std::string s = args.size() > 0 && args[0].string_convertible().empty() ? args[0].to_string() : "";
 	size_t pos = args.size() > 1 && args[1].number_convertible().empty() ? (size_t)args[1].to_int() : (size_t)0;
 	size_t len = args.size() > 2 && args[2].number_convertible().empty() ? (size_t)args[2].to_int() : (size_t)0;
-		pos = (size_t)args[1].to_int();
 
 	logger::error["function"] << "substr('" << s << "', " << pos << ", " << len << ") failure, reason: unknown error" << std::endl;
 	return s;
 }
+
+// ── String helpers ────────────────────────────────────────────────────────────
+
+static std::string arg_to_string(const expr::VARIABLE& var) {
+	return var.to_string();
+}
+
+expr::VARIABLE expr::functions::trim(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.empty()) return "";
+	return common::trim_ws(args[0].to_string());
+}
+
+expr::VARIABLE expr::functions::ltrim(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.empty()) return "";
+	std::string s = args[0].to_string();
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char c){ return !std::isspace(c); }));
+	return s;
+}
+
+expr::VARIABLE expr::functions::rtrim(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.empty()) return "";
+	std::string s = args[0].to_string();
+	s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char c){ return !std::isspace(c); }).base(), s.end());
+	return s;
+}
+
+expr::VARIABLE expr::functions::pad_left(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.size() < 2 ) {
+		logger::warning["function"] << "pad_left needs at least 2 arguments: string, width [, fill_char]" << std::endl;
+		return args.empty() ? "" : args[0].to_string();
+	}
+
+	std::string s    = args[0].to_string();
+	int         w    = args[1].to_int();
+	char        fill = args.size() > 2 ? arg_to_string(args[2]).front() : ' ';
+
+	if ( w <= 0 || (int)s.size() >= w ) return s;
+	return std::string(w - s.size(), fill) + s;
+}
+
+expr::VARIABLE expr::functions::pad_right(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.size() < 2 ) {
+		logger::warning["function"] << "pad_right needs at least 2 arguments: string, width [, fill_char]" << std::endl;
+		return args.empty() ? "" : args[0].to_string();
+	}
+
+	std::string s    = args[0].to_string();
+	int         w    = args[1].to_int();
+	char        fill = args.size() > 2 ? arg_to_string(args[2]).front() : ' ';
+
+	if ( w <= 0 || (int)s.size() >= w ) return s;
+	return s + std::string(w - s.size(), fill);
+}
+
+expr::VARIABLE expr::functions::str_repeat(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.size() < 2 ) {
+		logger::warning["function"] << "str_repeat needs 2 arguments: string, count" << std::endl;
+		return "";
+	}
+
+	std::string s = args[0].to_string();
+	int         n = args[1].to_int();
+
+	if ( n <= 0 || s.empty()) return "";
+
+	std::string result;
+	result.reserve(s.size() * n);
+	for ( int i = 0; i < n; i++ ) result += s;
+	return result;
+}
+
+expr::VARIABLE expr::functions::str_contains(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.size() < 2 ) {
+		logger::warning["function"] << "str_contains needs 2 arguments: string, needle" << std::endl;
+		return (double)0;
+	}
+
+	return (double)(args[0].to_string().find(args[1].to_string()) != std::string::npos ? 1 : 0);
+}
+
+expr::VARIABLE expr::functions::str_replace(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.size() < 3 ) {
+		logger::warning["function"] << "str_replace needs 3 arguments: string, search, replace" << std::endl;
+		return args.empty() ? "" : args[0].to_string();
+	}
+
+	std::string s      = args[0].to_string();
+	std::string search = args[1].to_string();
+	std::string repl   = args[2].to_string();
+
+	if ( search.empty()) return s;
+
+	std::string result;
+	size_t pos = 0, found;
+	while (( found = s.find(search, pos)) != std::string::npos ) {
+		result += s.substr(pos, found - pos);
+		result += repl;
+		pos = found + search.size();
+	}
+	result += s.substr(pos);
+	return result;
+}
+
+expr::VARIABLE expr::functions::str_find(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.size() < 2 ) {
+		logger::warning["function"] << "str_find needs 2 arguments: string, needle [, start_pos]" << std::endl;
+		return (double)-1;
+	}
+
+	std::string s      = args[0].to_string();
+	std::string needle = args[1].to_string();
+	size_t      start  = args.size() > 2 ? (size_t)args[2].to_int() : 0;
+
+	size_t pos = s.find(needle, start);
+	return pos == std::string::npos ? (double)-1 : (double)(int)pos;
+}
+
+// ── Numeric helpers ───────────────────────────────────────────────────────────
+
+expr::VARIABLE expr::functions::abs_val(const expr::FUNCTION_ARGS& args) {
+
+	return args.empty() ? (double)0 : std::abs(arg_to_double(args[0]));
+}
+
+expr::VARIABLE expr::functions::sign_val(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.empty()) return (double)0;
+	double d = arg_to_double(args[0]);
+	return d > 0 ? (double)1 : (d < 0 ? (double)-1 : (double)0);
+}
+
+expr::VARIABLE expr::functions::clamp_val(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.size() < 3 ) {
+		logger::warning["function"] << "clamp needs 3 arguments: value, min, max" << std::endl;
+		return args.empty() ? (double)0 : arg_to_double(args[0]);
+	}
+
+	double v  = arg_to_double(args[0]);
+	double lo = arg_to_double(args[1]);
+	double hi = arg_to_double(args[2]);
+	return std::clamp(v, lo, hi);
+}
+
+expr::VARIABLE expr::functions::map_range(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.size() < 5 ) {
+		logger::warning["function"] << "map_range needs 5 arguments: value, in_min, in_max, out_min, out_max" << std::endl;
+		return (double)0;
+	}
+
+	double v      = arg_to_double(args[0]);
+	double in_min = arg_to_double(args[1]);
+	double in_max = arg_to_double(args[2]);
+	double out_min = arg_to_double(args[3]);
+	double out_max = arg_to_double(args[4]);
+
+	if ( in_max == in_min ) {
+		logger::warning["function"] << "map_range: in_min == in_max, division by zero" << std::endl;
+		return out_min;
+	}
+
+	double result = out_min + (v - in_min) / (in_max - in_min) * (out_max - out_min);
+	return std::clamp(result, std::min(out_min, out_max), std::max(out_min, out_max));
+}
+
+expr::VARIABLE expr::functions::frac(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.empty()) return (double)0;
+	double d = arg_to_double(args[0]);
+	return d - std::floor(d);
+}
+
+expr::VARIABLE expr::functions::trunc_val(const expr::FUNCTION_ARGS& args) {
+
+	return args.empty() ? (double)0 : std::trunc(arg_to_double(args[0]));
+}
+
+expr::VARIABLE expr::functions::asin_fn(const expr::FUNCTION_ARGS& args) {
+
+	return args.empty() ? (double)0 : std::asin(arg_to_double(args[0]));
+}
+
+expr::VARIABLE expr::functions::acos_fn(const expr::FUNCTION_ARGS& args) {
+
+	return args.empty() ? (double)0 : std::acos(arg_to_double(args[0]));
+}
+
+expr::VARIABLE expr::functions::atan_fn(const expr::FUNCTION_ARGS& args) {
+
+	return args.empty() ? (double)0 : std::atan(arg_to_double(args[0]));
+}
+
+expr::VARIABLE expr::functions::atan2_fn(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.size() < 2 ) {
+		logger::warning["function"] << "atan2 needs 2 arguments: y, x" << std::endl;
+		return (double)0;
+	}
+	return std::atan2(arg_to_double(args[0]), arg_to_double(args[1]));
+}
+
+expr::VARIABLE expr::functions::hypot_fn(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.size() < 2 ) {
+		logger::warning["function"] << "hypot needs 2 arguments: x, y" << std::endl;
+		return (double)0;
+	}
+	return std::hypot(arg_to_double(args[0]), arg_to_double(args[1]));
+}
+
+// ── Formatting ────────────────────────────────────────────────────────────────
+
+expr::VARIABLE expr::functions::format_number(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.empty()) return "";
+
+	double d         = arg_to_double(args[0]);
+	int    precision = args.size() > 1 ? std::clamp(args[1].to_int(), 0, 15) : 2;
+
+	std::ostringstream ss;
+	ss << std::fixed << std::setprecision(precision) << d;
+	return ss.str();
+}
+
+expr::VARIABLE expr::functions::to_hex(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.empty()) return "0";
+
+	long long n = (long long)arg_to_double(args[0]);
+	bool uppercase = args.size() > 1 && args[1].to_int() != 0;
+
+	std::ostringstream ss;
+	if ( uppercase ) ss << std::uppercase;
+	ss << std::hex << n;
+	return ss.str();
+}
+
+expr::VARIABLE expr::functions::to_oct(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.empty()) return "0";
+	std::ostringstream ss;
+	ss << std::oct << (long long)arg_to_double(args[0]);
+	return ss.str();
+}
+
+expr::VARIABLE expr::functions::to_bin(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.empty()) return "0";
+
+	long long n = (long long)arg_to_double(args[0]);
+	if ( n == 0 ) return "0";
+
+	std::string result;
+	bool negative = n < 0;
+	unsigned long long u = negative ? (unsigned long long)(-n) : (unsigned long long)n;
+
+	while ( u > 0 ) {
+		result = char('0' + (u & 1)) + result;
+		u >>= 1;
+	}
+
+	return negative ? "-" + result : result;
+}
+
+// ── Conditional (function-style ternary, avoids parser space-termination) ────
+
+expr::VARIABLE expr::functions::if_fn(const expr::FUNCTION_ARGS& args) {
+
+	if ( args.size() < 3 ) {
+		logger::warning["function"] << "if() needs 3 arguments: condition, true_value, false_value" << std::endl;
+		return (double)0;
+	}
+
+	return arg_to_double(args[0]) != 0 ? args[1] : args[2];
+}
+
+// ── Built-in function registry ────────────────────────────────────────────────
 
 expr::FUNCTIONMAP expr::functions::builtin_functions = {
 
@@ -428,5 +710,49 @@ expr::FUNCTIONMAP expr::functions::builtin_functions = {
 	{ "to_lower", expr::functions::to_lower },
 	{ "strlower", expr::functions::to_lower },
 	{ "substr", expr::functions::substr },
+	{ "trim", expr::functions::trim },
+	{ "strip", expr::functions::trim },
+	{ "ltrim", expr::functions::ltrim },
+	{ "rtrim", expr::functions::rtrim },
+	{ "pad_left", expr::functions::pad_left },
+	{ "rpad", expr::functions::pad_left },
+	{ "pad_right", expr::functions::pad_right },
+	{ "lpad", expr::functions::pad_right },
+	{ "str_repeat", expr::functions::str_repeat },
+	{ "repeat", expr::functions::str_repeat },
+	{ "str_contains", expr::functions::str_contains },
+	{ "contains", expr::functions::str_contains },
+	{ "str_replace", expr::functions::str_replace },
+	{ "replace", expr::functions::str_replace },
+	{ "str_find", expr::functions::str_find },
+	{ "strpos", expr::functions::str_find },
+
+	{ "abs", expr::functions::abs_val },
+	{ "fabs", expr::functions::abs_val },
+	{ "sign", expr::functions::sign_val },
+	{ "sgn", expr::functions::sign_val },
+	{ "clamp", expr::functions::clamp_val },
+	{ "map_range", expr::functions::map_range },
+	{ "map", expr::functions::map_range },
+	{ "frac", expr::functions::frac },
+	{ "trunc", expr::functions::trunc_val },
+	{ "asin", expr::functions::asin_fn },
+	{ "acos", expr::functions::acos_fn },
+	{ "atan", expr::functions::atan_fn },
+	{ "atan2", expr::functions::atan2_fn },
+	{ "hypot", expr::functions::hypot_fn },
+
+	{ "format", expr::functions::format_number },
+	{ "number_format", expr::functions::format_number },
+	{ "hex", expr::functions::to_hex },
+	{ "to_hex", expr::functions::to_hex },
+	{ "oct", expr::functions::to_oct },
+	{ "to_oct", expr::functions::to_oct },
+	{ "bin", expr::functions::to_bin },
+	{ "to_bin", expr::functions::to_bin },
+
+	{ "if", expr::functions::if_fn },
+	{ "iif", expr::functions::if_fn },
+	{ "ternary", expr::functions::if_fn },
 
 };

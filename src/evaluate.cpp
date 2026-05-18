@@ -326,7 +326,7 @@ std::vector<expr::TOKEN> expr::expression::eval_conditionals(
 			logger::verbose["evaluate"] << "warning, while pre-processing conditional, false result is undefined result" << std::endl;
 		else if ( tokens[i]._cond2.size() == 0 ) {
 			logger::error["evaluate"] << "conditional false result evaluated to null" << std::endl;
-			tokens[i]._cond1.push_back(expr::TOKEN::UNDEF());
+			tokens[i]._cond2.push_back(expr::TOKEN::UNDEF());
 		}
 
 		return tokens;

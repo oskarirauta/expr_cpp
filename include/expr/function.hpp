@@ -51,6 +51,34 @@ namespace expr {
 		expr::VARIABLE to_upper(const expr::FUNCTION_ARGS& args);
 		expr::VARIABLE to_lower(const expr::FUNCTION_ARGS& args);
 		expr::VARIABLE substr(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE trim(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE ltrim(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE rtrim(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE pad_left(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE pad_right(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE str_repeat(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE str_contains(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE str_replace(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE str_find(const expr::FUNCTION_ARGS& args);
+
+		expr::VARIABLE abs_val(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE sign_val(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE clamp_val(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE map_range(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE frac(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE trunc_val(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE asin_fn(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE acos_fn(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE atan_fn(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE atan2_fn(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE hypot_fn(const expr::FUNCTION_ARGS& args);
+
+		expr::VARIABLE format_number(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE to_hex(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE to_oct(const expr::FUNCTION_ARGS& args);
+		expr::VARIABLE to_bin(const expr::FUNCTION_ARGS& args);
+
+		expr::VARIABLE if_fn(const expr::FUNCTION_ARGS& args);
 
 		extern expr::FUNCTIONMAP builtin_functions;
 	}

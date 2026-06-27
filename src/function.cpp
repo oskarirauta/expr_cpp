@@ -412,7 +412,8 @@ expr::VARIABLE expr::functions::pad_left(const expr::FUNCTION_ARGS& args) {
 
 	std::string s    = args[0].to_string();
 	int         w    = args[1].to_int();
-	char        fill = args.size() > 2 ? arg_to_string(args[2]).front() : ' ';
+	std::string fs   = args.size() > 2 ? arg_to_string(args[2]) : std::string(" ");
+	char        fill = fs.empty() ? ' ' : fs.front();
 
 	if ( w <= 0 || (int)s.size() >= w ) return s;
 	return std::string(w - s.size(), fill) + s;
@@ -427,7 +428,8 @@ expr::VARIABLE expr::functions::pad_right(const expr::FUNCTION_ARGS& args) {
 
 	std::string s    = args[0].to_string();
 	int         w    = args[1].to_int();
-	char        fill = args.size() > 2 ? arg_to_string(args[2]).front() : ' ';
+	std::string fs   = args.size() > 2 ? arg_to_string(args[2]) : std::string(" ");
+	char        fill = fs.empty() ? ' ' : fs.front();
 
 	if ( w <= 0 || (int)s.size() >= w ) return s;
 	return s + std::string(w - s.size(), fill);

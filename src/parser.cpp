@@ -60,12 +60,17 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 		while ( common::starts_with_space(s)) // || unsupported_tokens.find_first_of(s.front()) != std::string::npos )
 			s.erase(0, 1);
 
+		if ( s.empty())		// the string may be nothing but trailing spaces
+			break;
+
 		if ( unsupported_characters.find_first_of(s.front()) != std::string::npos ) {
 
 			std::string ignored_word;
 
-			while ( unsupported_characters.find_first_of(s.front()) != std::string::npos )
-				ignored_word += s.erase(0, 1);
+			while ( !s.empty() && unsupported_characters.find_first_of(s.front()) != std::string::npos ) {
+				ignored_word += s.front();
+				s.erase(0, 1);
+			}
 
 			logger::warning["parser"] << "ignoring unsupported characters '" << ignored_word <<
 				"' at <" << expr << ">" << std::endl;
@@ -83,7 +88,7 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 
 			word += common::erase_front(s);
 
-			while ( common::starts_with_alnum(s) || unsupported_characters.find_first_of(s.front()) != std::string::npos )
+			while ( !s.empty() && ( common::starts_with_alnum(s) || unsupported_characters.find_first_of(s.front()) != std::string::npos ))
 				word += common::erase_front(s);
 
 			token = expr::T_VARIABLE;
@@ -105,7 +110,7 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 			while ( common::starts_with_digit(s))
 				word += common::erase_front(s);
 
-			if ( s.front() == '.' ) {
+			if ( !s.empty() && s.front() == '.' ) {
 
 				word += common::erase_front(s);
 
@@ -126,7 +131,7 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 				token = expr::T_NUMBER;
 				try {
 					token = std::stod(word);
-				} catch ( std::invalid_argument& e ) {
+				} catch ( const std::exception& e ) {	// invalid_argument or out_of_range (overflow)
 					logger::error["parser"] << "cannot convert '" << word << "' to number" << std::endl;
 					token = (double)0;
 				}
@@ -204,7 +209,7 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 										break;
 									default:
 										logger::warning["parser"] <<
-											"Illegal hex sequence '\\x" << s.at(2) << "' in <" <<
+											"Illegal hex sequence '\\x" << ( s.size() > 2 ? s.at(2) : '?' ) << "' in <" <<
 											expr << "> keeps unchanged" << std::endl;
 										hexC = '\\';
 										s.erase(0, 1);
@@ -220,22 +225,20 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 						case '1':
 						case '2':
 						case '3':
-							if ( s.at(2) >= '0' && s.at(2) <= '7' &&
+							if ( s.size() >= 4 && s.at(2) >= '0' && s.at(2) <= '7' &&
 								s.at(3) >= '0' && s.at(3) <= '7' ) {
 
 								word += (( s.at(1) - '0' ) * 64 + ( s.at(2) - '0' ) * 8 + ( s.at(3) - '0' ));
 								s.erase(0, 4);
 							} else {
 								logger::warning["parser"] <<
-									"illegal octal sequence '\\" <<
-									s.at(1) << s.at(2) << s.at(3) <<
-									"' in <" << expr << ">" << std::endl;
+									"illegal octal sequence in <" << expr << ">" << std::endl;
 								word += common::erase_front(s);
 							}
 							break;
 						default:
 							logger::warning["parser"] <<
-								"unknown escape sequence '\\" << s.at(1) <<
+								"unknown escape sequence '\\" << ( s.size() > 1 ? s.at(1) : '?' ) <<
 								"' in <" << expr << ">" << std::endl;
 							word += common::erase_front(s);
 					}
@@ -244,7 +247,7 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 
 			token = expr::T_STRING;
 
-			if ( s.front() == quote )
+			if ( !s.empty() && s.front() == quote )
 				s.erase(0, 1);
 			else
 				logger::warning["parser"] <<
@@ -457,11 +460,10 @@ std::vector<expr::TOKEN> expr::expression::parse_expr(const std::string& expr, b
 
 		if ( !ignore && !tokens.empty() && token == expr::T_OPERATOR && tokens.back() == expr::T_OPERATOR ) {
 
-			if ( !(( token == expr::OP_SUB && tokens.back() == expr::OP_SUB ) ||
-				( token == expr::OP_SUB && tokens.back() == expr::OP_NOT ) ||
-				( token == expr::OP_SUB && tokens.back() == expr::OP_NNOT ) ||
-				( token == expr::OP_NOT && tokens.back() == expr::OP_SUB ) ||
-				( token == expr::OP_NNOT && tokens.back() == expr::OP_SUB ))) {
+			// two operators in a row is valid only when the second one is a
+			// unary modifier (negation '-' or logical not '!'/'!!') applied to
+			// the right-hand side, e.g. "5 + -4" or "x && !y"
+			if ( !( token == expr::OP_SUB || token == expr::OP_NOT || token == expr::OP_NNOT )) {
 
 				logger::warning["parser"] << "2 mathematical modifier operators ( " << describe(token._op) <<
 					" and " << describe(tokens.back()._op) << " cannot be in row, ignoring operator " <<

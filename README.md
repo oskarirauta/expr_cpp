@@ -1,12 +1,8 @@
-# expr_cpp
-expression evalution library for C++
-
+[![License:MIT](https://img.shields.io/badge/License-MIT-blue?style=plastic)](LICENSE)
 [![C++ CI build](https://github.com/oskarirauta/expr_cpp/actions/workflows/build.yml/badge.svg)](https://github.com/oskarirauta/expr_cpp/actions/workflows/build.yml)
 
-### Requirement
-Relatively new gcc/g++ version is required for building, meaning that
-minimum version to build succesfully is gcc-13. Best results when
-built with parameter ```--std=c++23```
+# expr_cpp
+expression evaluation library for C++
 
 ### Description
 
@@ -31,10 +27,43 @@ This will be written as a git submodule that can be easily
 included with other projects. On it's own, this is useful
 mostly for demonstration purposes.
 
-### depencies
+### Usage
+
+```cpp
+#include <iostream>
+#include "expr/expression.hpp"
+
+// a custom function: sums its numeric arguments
+expr::VARIABLE sum(const expr::FUNCTION_ARGS& args) {
+    double total = 0;
+    for ( const expr::VARIABLE& arg : args )
+        if ( arg == expr::V_NUMBER )
+            total += (double)arg;
+    return total;
+}
+
+int main() {
+
+    expr::VARIABLEMAP variables = { { "name", "OpenWrt" }, { "width", (double)128 } };
+    expr::FUNCTIONMAP functions = { { "sum", sum } };
+
+    expr::expression e("'hi, ' . name . ' (' . to_string(sum(width, 2)) . ')'");
+    expr::RESULT result = e.evaluate(&functions, &variables);
+
+    std::cout << result << std::endl;   // hi, OpenWrt (130)
+    return 0;
+}
+```
+
+Expressions support numbers and strings, arithmetic (`+ - * / %`), comparison
+(`== != < > <= >=`), logical (`&& || !`), the ternary `?:`, string concatenation
+(`.`), variables, custom functions and a set of built-ins (`to_string`, `time`,
+`strftime`, `date::*`, `time::*`, `pi`, ...). See [`main.cpp`](main.cpp) for more.
+
+### dependencies
  - gcc 13 or newer and c++ standard c++20 or newer, c++23 recommended
- - common: [https://github.com/oskarirauta/common_cpp.git](https://github.com/oskarirauta/common_cpp)
- - logger: [https://github.com/oskarirauta/logcpp.git](https://github.com/oskarirauta/logcpp)
+ - common: [common_cpp](https://github.com/oskarirauta/common_cpp.git)
+ - logger: [logger_cpp](https://github.com/oskarirauta/logger_cpp.git)
 
 ### development status
 on-going; but works pretty nicely and is usable.

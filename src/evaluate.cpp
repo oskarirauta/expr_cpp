@@ -220,6 +220,9 @@ std::vector<expr::TOKEN> expr::expression::eval_parentheses(std::vector<expr::TO
 
 		begin_loop:
 
+		if ( tokens.empty())		// the erase paths below can empty the vector
+			break;
+
 		if ( tokens[i] != expr::T_SUB )
 			continue;
 
@@ -379,6 +382,9 @@ std::vector<expr::TOKEN> expr::expression::eval(
 	tokens = eval_functions(tokens, functions, variables);
 	tokens = eval_parentheses(tokens, functions, variables);
 	tokens = eval_conditionals(tokens, functions, variables);
+
+	if ( tokens.empty())		// parentheses/conditionals can reduce to nothing
+		return tokens;
 
 	// evaluate base ops
 
@@ -822,6 +828,9 @@ expr::TOKEN expr::expression::evaluate(std::vector<expr::TOKEN>& tokens, expr::F
 			abort = true;
 		}
 	}
+
+	if ( tokens.empty())		// nothing left to evaluate (e.g. "()")
+		return expr::TOKEN::UNDEF();
 
 	if ( !abort && tokens.front() == expr::T_VARIABLE ) {
 		try {

@@ -117,7 +117,7 @@ expr::TOKEN::operator double() const {
 
 		try {
 			n = std::stod(s);
-		} catch ( std::invalid_argument& e ) {
+		} catch ( const std::exception& e ) {	// invalid_argument or out_of_range
 			logger::error["convert"] <<
 				"failed to convert string token '" << s <<
 				"' to number value" << std::endl;

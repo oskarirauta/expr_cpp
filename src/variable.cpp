@@ -125,7 +125,7 @@ expr::VARIABLE::operator double() const {
 
 					try {
 						n = std::stod(s);
-					} catch ( std::invalid_argument& e ) {
+					} catch ( const std::exception& e ) {	// invalid_argument or out_of_range
 						logger::error["convert"] <<
 							"failed to convert string '" << s <<
 							"' to number value, using value 0" << std::endl;
@@ -257,7 +257,7 @@ std::string expr::VARIABLE::number_convertible() const {
 
 		try {
 			std::stod(s);
-		} catch ( std::invalid_argument& e ) {
+		} catch ( const std::exception& e ) {	// invalid_argument or out_of_range
 			return "string '" + s + "' to number conversion failed: " + std::string(e.what());
 		}
 
